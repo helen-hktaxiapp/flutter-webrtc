@@ -18,6 +18,7 @@ class MediaStreamTrackNative extends MediaStreamTrack {
   bool _enabled;
 
   bool _muted = false;
+  bool _on = false;
 
   @override
   set enabled(bool enabled) {
@@ -47,6 +48,9 @@ class MediaStreamTrackNative extends MediaStreamTrack {
   bool get muted => _muted;
 
   @override
+  bool get on => _on;
+
+  @override
   Future<bool> hasTorch() => _channel.invokeMethod(
         'mediaStreamTrackHasTorch',
         <String, dynamic>{'trackId': _trackId},
@@ -71,7 +75,6 @@ class MediaStreamTrackNative extends MediaStreamTrack {
   }
 
   //helen
-  @override
   void setBluetoothScoOn (bool on) async {
     print('MediaStreamTrack:setBluetoothScoOn $on');
     await _channel.invokeMethod(
@@ -112,5 +115,10 @@ class MediaStreamTrackNative extends MediaStreamTrack {
       'trackDispose',
       <String, dynamic>{'trackId': _trackId},
     );
+  }
+
+  @override
+  void set on(bool on) {
+    // TODO: implement on
   }
 }

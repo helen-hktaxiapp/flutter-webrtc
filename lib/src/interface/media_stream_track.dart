@@ -40,6 +40,11 @@ abstract class MediaStreamTrack {
   /// Returns true if the track is muted, and false otherwise.
   bool get muted;
 
+  //helen
+  bool get on;
+  set on(bool on);
+
+
   /// Returns a map containing the set of constraints most recently established
   /// for the track using a prior call to applyConstraints().
   ///
@@ -93,7 +98,7 @@ abstract class MediaStreamTrack {
     throw UnimplementedError();
   }
 
-  //helen
+  //helen 
   void setBluetoothScoOn(bool on){
     throw UnimplementedError();
   }
