@@ -110,6 +110,14 @@ public class FlutterWebRTCPlugin implements FlutterPlugin, ActivityAware {
               rtcAudioManager.setSpeakerphoneOn(on);
             }
           }
+          
+          @Override
+          public void setBluetoothScoOn(boolean on) {
+            if (rtcAudioManager != null) {
+              rtcAudioManager.setBluetoothScoOn(on);
+            }
+          }
+
         });
 
     channel = new MethodChannel(messenger, "FlutterWebRTC.Method");

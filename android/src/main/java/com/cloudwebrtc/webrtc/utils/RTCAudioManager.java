@@ -65,7 +65,7 @@ public class RTCAudioManager {
   private boolean savedIsSpeakerPhoneOn;
   private boolean savedIsMicrophoneMute;
   private boolean hasWiredHeadset;
-  
+
   //helen
   private boolean savedIsBluetoothOn;
 
@@ -211,6 +211,8 @@ public class RTCAudioManager {
     savedIsSpeakerPhoneOn = audioManager.isSpeakerphoneOn();
     savedIsMicrophoneMute = audioManager.isMicrophoneMute();
     hasWiredHeadset = hasWiredHeadset();
+    //helen
+    savedIsBluetoothOn = audioManager.isBluetoothScoOn();
 
     // Create an AudioManager.OnAudioFocusChangeListener instance.
     audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
@@ -308,6 +310,8 @@ public class RTCAudioManager {
     setSpeakerphoneOn(savedIsSpeakerPhoneOn);
     setMicrophoneMute(savedIsMicrophoneMute);
     audioManager.setMode(savedAudioMode);
+    //helen
+    setBluetoothOn(savedIsBluetoothOn);
 
     // Abandon audio focus. Gives the previous focus owner, if any, focus.
     audioManager.abandonAudioFocus(audioFocusChangeListener);
@@ -331,15 +335,19 @@ public class RTCAudioManager {
     switch (device) {
       case SPEAKER_PHONE:
         setSpeakerphoneOn(true);
+        setBluetoothOn(false);
         break;
       case EARPIECE:
         setSpeakerphoneOn(false);
+        setBluetoothOn(false);
         break;
       case WIRED_HEADSET:
         setSpeakerphoneOn(false);
+        setBluetoothOn(false);
         break;
       case BLUETOOTH:
         setSpeakerphoneOn(false);
+        setBluetoothOn(true);
         break;
       default:
         Log.e(TAG, "Invalid audio device selection");
@@ -429,6 +437,24 @@ public class RTCAudioManager {
       return;
     }
     audioManager.setMicrophoneMute(on);
+  }
+
+  //helen
+  public void setBluetoothScoOn(boolean on){
+    boolean bluetoothOn = audioManager.isBluetoothScoOn();
+    if(bluetoothOn == on){
+      return ;
+    }
+    final RTCBluetoothManager.State btManagerState = bluetoothManager.getState();
+    final boolean isBTAvailable =  
+    btManagerState == RTCBluetoothManager.State.SCO_CONNECTED
+        || btManagerState == RTCBluetoothManager.State.SCO_CONNECTING
+        || btManagerState == RTCBluetoothManager.State.HEADSET_AVAILABLE;
+    if(!on && bluetoothOn){
+        bluetoothManager.startScoAudio();
+    }
+    audioManager.setSpeakerphoneOn(!on);
+    audioManager.setBluetoothScoOn(on);
   }
 
   /** Gets the current earpiece state. */
