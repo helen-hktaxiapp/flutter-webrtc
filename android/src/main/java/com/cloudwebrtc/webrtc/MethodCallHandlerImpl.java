@@ -349,6 +349,17 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
         result.success(null);
         break;
       }
+      //helen
+      // case "mediaStreamSetOn":{
+      //   String trackId = call.argument("trackId");
+      //   Boolean on = call.argument("on");
+      //   MediaStreamTrack track = getTrackForId(trackId);
+      //   if (track != null) {
+      //     track.setOn(on);
+      //   }
+      //   result.success(null);
+      //   break;
+      // }
       case "mediaStreamAddTrack": {
         String streamId = call.argument("streamId");
         String trackId = call.argument("trackId");
@@ -453,21 +464,25 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
         result.success(null);
         break;
       }
-      case "setMicrophoneMute":
+      case "setMicrophoneMute":{
         boolean mute = call.argument("mute");
         audioManager.setMicrophoneMute(mute);
         result.success(null);
         break;
-      case "enableSpeakerphone":
+      }
+      case "enableSpeakerphone": {
         boolean enable = call.argument("enable");
         audioManager.setSpeakerphoneOn(enable);
         result.success(null);
         break;
+      }
       //helen
-      case "setBluetoothScoOn":
+      case "setBluetoothScoOn":{
         boolean on = call.argument("on");
         audioManager.setBluetoothScoOn(on);
         result.success(null);
+        break;
+      }
       case "getDisplayMedia": {
         Map<String, Object> constraints = call.argument("constraints");
         ConstraintsMap constraintsMap = new ConstraintsMap(constraints);
@@ -1126,6 +1141,18 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
     }
     track.setEnabled(enabled);
   }
+
+  //helen
+  // public void mediaStreamTrackSetOn(final String id, final boolean on) {
+  //   MediaStreamTrack track = localTracks.get(id);
+  //   if (track == null) {
+  //     Log.d(TAG, "mediaStreamTrackSetOn() track is null");
+  //     return;
+  //   } else if (track.on() == on) {
+  //     return;
+  //   }
+  //   track.setOn(on);
+  // }
 
   public void mediaStreamTrackSetVolume(final String id, final double volume) {
     MediaStreamTrack track = localTracks.get(id);
