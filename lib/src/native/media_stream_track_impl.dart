@@ -70,6 +70,16 @@ class MediaStreamTrackNative extends MediaStreamTrack {
     );
   }
 
+  //helen
+  @override
+  void setBluetoothScoOn (bool on) async {
+    print('MediaStreamTrack:setBluetoothScoOn $on');
+    await _channel.invokeMethod(
+      'setBluetoothScoOn',
+      <String, dynamic>{'trackId': _trackId, 'on': on},
+    );
+  }
+
   @override
   Future<dynamic> captureFrame([String filePath]) {
     return _channel.invokeMethod<void>(

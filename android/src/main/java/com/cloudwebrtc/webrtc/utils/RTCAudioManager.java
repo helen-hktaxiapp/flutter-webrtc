@@ -65,6 +65,9 @@ public class RTCAudioManager {
   private boolean savedIsSpeakerPhoneOn;
   private boolean savedIsMicrophoneMute;
   private boolean hasWiredHeadset;
+  
+  //helen
+  private boolean savedIsBluetoothOn;
 
   // Default audio device; speaker phone for video calls or earpiece for audio
   // only calls.

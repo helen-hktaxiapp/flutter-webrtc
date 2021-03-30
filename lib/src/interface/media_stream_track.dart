@@ -93,6 +93,11 @@ abstract class MediaStreamTrack {
     throw UnimplementedError();
   }
 
+  //helen
+  void setBluetoothScoOn(bool on){
+    throw UnimplementedError();
+  }
+
   Future<dynamic> captureFrame([String filePath]) {
     throw UnimplementedError();
   }

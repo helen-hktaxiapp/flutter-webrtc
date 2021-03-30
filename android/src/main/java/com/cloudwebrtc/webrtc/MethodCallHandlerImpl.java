@@ -84,7 +84,8 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
 
     void setSpeakerphoneOn(boolean on);
 
-
+    //helen
+    void setBluetoothScoOn(boolean on);
   }
 
   static public final String TAG = "FlutterWebRTCPlugin";
@@ -462,6 +463,11 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
         audioManager.setSpeakerphoneOn(enable);
         result.success(null);
         break;
+      //helen
+      case "setBluetoothScoOn":
+        boolean on = call.argument("on");
+        audioManager.setBluetoothScoOn(on);
+        result.success(null);
       case "getDisplayMedia": {
         Map<String, Object> constraints = call.argument("constraints");
         ConstraintsMap constraintsMap = new ConstraintsMap(constraints);
