@@ -6,10 +6,10 @@ import '../interface/media_stream_track.dart';
 import 'utils.dart';
 
 class MediaStreamTrackNative extends MediaStreamTrack {
-  MediaStreamTrackNative(this._trackId, this._label, this._kind, this._enabled);
+  MediaStreamTrackNative(this._trackId, this._label, this._kind, this._enabled, this._on);
   factory MediaStreamTrackNative.fromMap(Map<dynamic, dynamic> map) {
     return MediaStreamTrackNative(
-        map['id'], map['label'], map['kind'], map['enabled']);
+        map['id'], map['label'], map['kind'], map['enabled'], map['on']);
   }
   final _channel = WebRTC.methodChannel();
   final String _trackId;
@@ -76,7 +76,7 @@ class MediaStreamTrackNative extends MediaStreamTrack {
 
   //helen
   @override
-  void setBluetoothScoOn (bool on) async {
+  void setBluetoothScoOn(bool on) async {
     print('MediaStreamTrack:setBluetoothScoOn $on');
     await _channel.invokeMethod(
       'setBluetoothScoOn',

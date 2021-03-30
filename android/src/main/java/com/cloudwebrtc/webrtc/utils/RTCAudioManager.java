@@ -311,7 +311,7 @@ public class RTCAudioManager {
     setMicrophoneMute(savedIsMicrophoneMute);
     audioManager.setMode(savedAudioMode);
     //helen
-    setBluetoothOn(savedIsBluetoothOn);
+    setBluetoothScoOn(savedIsBluetoothOn);
 
     // Abandon audio focus. Gives the previous focus owner, if any, focus.
     audioManager.abandonAudioFocus(audioFocusChangeListener);
@@ -335,19 +335,19 @@ public class RTCAudioManager {
     switch (device) {
       case SPEAKER_PHONE:
         setSpeakerphoneOn(true);
-        setBluetoothOn(false);
+        setBluetoothScoOn(false);
         break;
       case EARPIECE:
         setSpeakerphoneOn(false);
-        setBluetoothOn(false);
+        setBluetoothScoOn(false);
         break;
       case WIRED_HEADSET:
         setSpeakerphoneOn(false);
-        setBluetoothOn(false);
+        setBluetoothScoOn(false);
         break;
       case BLUETOOTH:
         setSpeakerphoneOn(false);
-        setBluetoothOn(true);
+        setBluetoothScoOn(true);
         break;
       default:
         Log.e(TAG, "Invalid audio device selection");
