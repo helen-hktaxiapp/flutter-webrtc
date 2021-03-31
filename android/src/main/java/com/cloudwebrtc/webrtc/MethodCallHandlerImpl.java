@@ -85,7 +85,7 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
     void setSpeakerphoneOn(boolean on);
 
     //helen
-    void setBluetoothScoOn(boolean on);
+    void setBluetoothScoOn(boolean onBluetooth);
   }
 
   static public final String TAG = "FlutterWebRTCPlugin";
@@ -478,8 +478,8 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
       }
       //helen
       case "setBluetoothScoOn":{
-        boolean on = call.argument("onBluetooth");
-        audioManager.setBluetoothScoOn(on);
+        boolean onBluetooth = call.argument("onBluetooth");
+        audioManager.setBluetoothScoOn(onBluetooth);
         result.success(null);
         break;
       }

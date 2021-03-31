@@ -440,10 +440,11 @@ public class RTCAudioManager {
   }
 
   //helen
-  public void setBluetoothScoOn(boolean on){
+  public void setBluetoothScoOn(boolean onBluetooth){
     System.out.println("--------RTCAudioManager.java setBluetoothScoOn");
     boolean bluetoothOn = audioManager.isBluetoothScoOn();
-    if(bluetoothOn == on){
+    if(bluetoothOn == onBluetooth){
+      System.out.println("Nothing is done");
       return ;
     }
     final RTCBluetoothManager.State btManagerState = bluetoothManager.getState();
@@ -457,11 +458,11 @@ public class RTCAudioManager {
     // }
     bluetoothManager.startScoAudio();
     System.out.println("-------RTCAudioManager.java startScoAudio 123");
-    audioManager.setSpeakerphoneOn(!on);
-    audioManager.setBluetoothScoOn(on);
+    audioManager.setSpeakerphoneOn(!onBluetooth);
+    audioManager.setBluetoothScoOn(onBluetooth);
     userSelectedAudioDevice = AudioDevice.BLUETOOTH;
-    // updateAudioDeviceState();
-    bluetoothManager.startScoAudio();
+    updateAudioDeviceState();
+    // bluetoothManager.startScoAudio();
     System.out.println("---------RTCAudioManager.java bluetoothManager.startScoAudio");
   }
 
