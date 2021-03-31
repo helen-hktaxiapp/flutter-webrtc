@@ -462,7 +462,7 @@ public class RTCAudioManager {
     userSelectedAudioDevice = AudioDevice.BLUETOOTH;
     // updateAudioDeviceState();
     bluetoothManager.startScoAudio();
-    System.println("---------RTCAudioManager.java bluetoothManager.startScoAudio");
+    System.out.println("---------RTCAudioManager.java bluetoothManager.startScoAudio");
   }
 
   /** Gets the current earpiece state. */
