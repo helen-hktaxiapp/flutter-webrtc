@@ -18,6 +18,7 @@ class MediaStreamTrackNative extends MediaStreamTrack {
   bool _enabled;
 
   bool _muted = false;
+  //helen
   bool _on = false;
 
   @override
@@ -47,6 +48,18 @@ class MediaStreamTrackNative extends MediaStreamTrack {
   @override
   bool get muted => _muted;
 
+  //helen
+  @override
+  set on(bool on){
+    _channel.invokeMethod('mediaStreamTrackSetEnable',
+        <String, dynamic>{'trackId': _trackId, 'on': _on});
+    _on = on;
+
+    if (kind == 'audio') {
+      _muted = !on;
+      muted ? onMute?.call() : onUnMute?.call();
+    }
+  }
   @override
   bool get on => _on;
 
@@ -116,10 +129,5 @@ class MediaStreamTrackNative extends MediaStreamTrack {
       'trackDispose',
       <String, dynamic>{'trackId': _trackId},
     );
-  }
-
-  @override
-  void set on(bool on) {
-    // TODO: implement on
   }
 }
