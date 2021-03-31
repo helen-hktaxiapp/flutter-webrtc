@@ -478,8 +478,8 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
       }
       //helen
       case "setBluetoothScoOn":{
-        boolean onBluetooth = call.argument("onBluetooth");
-        audioManager.setBluetoothScoOn(onBluetooth);
+        // boolean onBluetooth = call.argument("onBluetooth");
+        audioManager.setBluetoothScoOn(true);
         result.success(null);
         break;
       }

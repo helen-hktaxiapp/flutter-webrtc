@@ -49,17 +49,17 @@ class MediaStreamTrackNative extends MediaStreamTrack {
   bool get muted => _muted;
 
   //helen
-  @override
-  set onBluetooth(bool onBluetooth){
-    _channel.invokeMethod('mediaStreamTrackSetEnable',
-        <String, dynamic>{'trackId': _trackId, 'on': _onBluetooth});
-    _onBluetooth = onBluetooth;
+  // @override
+  // set onBluetooth(bool onBluetooth){
+  //   _channel.invokeMethod('mediaStreamTrackSetEnable',
+  //       <String, dynamic>{'trackId': _trackId, 'on': _onBluetooth});
+  //   _onBluetooth = onBluetooth;
 
-    if (kind == 'audio') {
-      _muted = !onBluetooth;
-      muted ? onMute?.call() : onUnMute?.call();
-    }
-  }
+  //   if (kind == 'audio') {
+  //     _muted = !onBluetooth;
+  //     muted ? onMute?.call() : onUnMute?.call();
+  //   }
+  // }
   @override
   bool get onBluetooth => _onBluetooth;
 
