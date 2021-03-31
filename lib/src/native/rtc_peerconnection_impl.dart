@@ -157,7 +157,7 @@ class RTCPeerConnectionNative extends RTCPeerConnection {
         });
         Map<dynamic, dynamic> track = map['track'];
         var oldTrack = MediaStreamTrackNative(
-            map['trackId'], track['label'], track['kind'], track['enabled'], track['on']);
+            map['trackId'], track['label'], track['kind'], track['enabled'], track['onBluetooth']);
         onRemoveTrack?.call(stream, oldTrack);
         break;
       case 'didOpenDataChannel':

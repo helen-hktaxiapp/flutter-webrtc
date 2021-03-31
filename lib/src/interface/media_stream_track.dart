@@ -41,8 +41,8 @@ abstract class MediaStreamTrack {
   bool get muted;
 
   //helen
-  bool get on;
-  set on(bool on);
+  bool get onBluetooth;
+  set onBluetooth(bool onBluetooth);
 
 
   /// Returns a map containing the set of constraints most recently established
@@ -99,7 +99,7 @@ abstract class MediaStreamTrack {
   }
 
   //helen 
-  void setBluetoothScoOn(bool on){
+  void setBluetoothScoOn(bool onBluetooth){
     throw UnimplementedError();
   }
 

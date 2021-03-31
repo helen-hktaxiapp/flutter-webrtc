@@ -561,6 +561,7 @@ public class RTCAudioManager {
       userSelectedAudioDevice = AudioDevice.SPEAKER_PHONE;
     }
 
+    System.out.println("----RTCAudioManager.java RTCbluetoothmanager")
     // Need to start Bluetooth if it is available and user either selected it explicitly or
     // user did not select any output device.
     boolean needBluetoothAudioStart =

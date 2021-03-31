@@ -6,7 +6,7 @@ import '../interface/media_stream_track.dart';
 import 'utils.dart';
 
 class MediaStreamTrackNative extends MediaStreamTrack {
-  MediaStreamTrackNative(this._trackId, this._label, this._kind, this._enabled, this._on);
+  MediaStreamTrackNative(this._trackId, this._label, this._kind, this._enabled, this._onBluetooth);
   factory MediaStreamTrackNative.fromMap(Map<dynamic, dynamic> map) {
     return MediaStreamTrackNative(
         map['id'], map['label'], map['kind'], map['enabled'], map['on']);
@@ -19,7 +19,7 @@ class MediaStreamTrackNative extends MediaStreamTrack {
 
   bool _muted = false;
   //helen
-  bool _on = false;
+  bool _onBluetooth = false;
 
   @override
   set enabled(bool enabled) {
@@ -50,18 +50,18 @@ class MediaStreamTrackNative extends MediaStreamTrack {
 
   //helen
   @override
-  set on(bool on){
+  set onBluetooth(bool onBluetooth){
     _channel.invokeMethod('mediaStreamTrackSetEnable',
-        <String, dynamic>{'trackId': _trackId, 'on': _on});
-    _on = on;
+        <String, dynamic>{'trackId': _trackId, 'on': _onBluetooth});
+    _onBluetooth = onBluetooth;
 
     if (kind == 'audio') {
-      _muted = !on;
+      _muted = !onBluetooth;
       muted ? onMute?.call() : onUnMute?.call();
     }
   }
   @override
-  bool get on => _on;
+  bool get onBluetooth => _onBluetooth;
 
   @override
   Future<bool> hasTorch() => _channel.invokeMethod(
@@ -89,11 +89,11 @@ class MediaStreamTrackNative extends MediaStreamTrack {
 
   //helen
   @override
-  void setBluetoothScoOn(bool on) async {
-    print('MediaStreamTrack:setBluetoothScoOn $on');
+  void setBluetoothScoOn(bool onBluetooth) async {
+    print('MediaStreamTrack:setBluetoothScoOn $onBluetooth');
     await _channel.invokeMethod(
       'setBluetoothScoOn',
-      <String, dynamic>{'trackId': _trackId, 'on': on},
+      <String, dynamic>{'trackId': _trackId, 'on': onBluetooth},
     );
   }
 
