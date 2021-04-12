@@ -127,7 +127,7 @@ class RTCPeerConnectionNative extends RTCPeerConnection {
         Map<dynamic, dynamic> track = map['track'];
 
         var newTrack = MediaStreamTrackNative(
-            map['trackId'], track['label'], track['kind'], track['enabled'], track['on']);
+            map['trackId'], track['label'], track['kind'], track['enabled']);
         String kind = track['kind'];
 
         var stream =
@@ -157,7 +157,7 @@ class RTCPeerConnectionNative extends RTCPeerConnection {
         });
         Map<dynamic, dynamic> track = map['track'];
         var oldTrack = MediaStreamTrackNative(
-            map['trackId'], track['label'], track['kind'], track['enabled'], track['onBluetooth']);
+            map['trackId'], track['label'], track['kind'], track['enabled']);
         onRemoveTrack?.call(stream, oldTrack);
         break;
       case 'didOpenDataChannel':

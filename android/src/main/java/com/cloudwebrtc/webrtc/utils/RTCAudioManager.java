@@ -26,6 +26,10 @@ import java.util.HashSet;
 import java.util.Set;
 import com.cloudwebrtc.webrtc.utils.RTCUtils;
 import org.webrtc.ThreadUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Arrays;
+import com.cloudwebrtc.webrtc.FlutterWebRTCPlugin;
 
 /**
  * RTCAudioManager manages all audio related parts of the plugin.
@@ -41,6 +45,12 @@ public class RTCAudioManager {
    * support.
    */
   public enum AudioDevice { SPEAKER_PHONE, WIRED_HEADSET, EARPIECE, BLUETOOTH, NONE }
+  public List <String> deviceNames = new ArrayList<String>();
+  public Set<String> audioNameSet = new HashSet<String>(){{
+    add("Microphone");
+    add("Speaker");
+  }};
+  String bluetoothName = "";
 
   /** AudioManager state. */
   public enum AudioManagerState {
@@ -50,7 +60,7 @@ public class RTCAudioManager {
   }
 
   /** Selected audio device change event. */
-  public interface AudioManagerEvents {
+  public interface AudioManagerEvents { 
     // Callback fired once audio device is changed or list of available audio devices changed.
     void onAudioDeviceChanged(
         AudioDevice selectedAudioDevice, Set<AudioDevice> availableAudioDevices);
@@ -65,9 +75,7 @@ public class RTCAudioManager {
   private boolean savedIsSpeakerPhoneOn;
   private boolean savedIsMicrophoneMute;
   private boolean hasWiredHeadset;
-
-  //helen
-  private boolean savedIsBluetoothOn;
+  static FlutterWebRTCPlugin webRTCPlugin;
 
   // Default audio device; speaker phone for video calls or earpiece for audio
   // only calls.
@@ -169,7 +177,7 @@ public class RTCAudioManager {
     bluetoothManager = RTCBluetoothManager.create(context, this);
     wiredHeadsetReceiver = new WiredHeadsetReceiver();
     amState = AudioManagerState.UNINITIALIZED;
-
+    
     useSpeakerphone = SPEAKERPHONE_AUTO;
 
     Log.d(TAG, "useSpeakerphone: " + useSpeakerphone);
@@ -211,8 +219,6 @@ public class RTCAudioManager {
     savedIsSpeakerPhoneOn = audioManager.isSpeakerphoneOn();
     savedIsMicrophoneMute = audioManager.isMicrophoneMute();
     hasWiredHeadset = hasWiredHeadset();
-    //helen
-    savedIsBluetoothOn = audioManager.isBluetoothScoOn();
 
     // Create an AudioManager.OnAudioFocusChangeListener instance.
     audioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
@@ -290,6 +296,9 @@ public class RTCAudioManager {
     // wired headset.
     registerReceiver(wiredHeadsetReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
     Log.d(TAG, "AudioManager started");
+    audioNameSet.clear();
+    audioNameSet.add("Microphone");
+    audioNameSet.add("Speaker");
   }
 
   @SuppressWarnings("deprecation") // TODO(henrika): audioManager.abandonAudioFocus() is deprecated.
@@ -310,8 +319,6 @@ public class RTCAudioManager {
     setSpeakerphoneOn(savedIsSpeakerPhoneOn);
     setMicrophoneMute(savedIsMicrophoneMute);
     audioManager.setMode(savedAudioMode);
-    //helen
-    setBluetoothScoOn(savedIsBluetoothOn);
 
     // Abandon audio focus. Gives the previous focus owner, if any, focus.
     audioManager.abandonAudioFocus(audioFocusChangeListener);
@@ -335,15 +342,12 @@ public class RTCAudioManager {
     switch (device) {
       case SPEAKER_PHONE:
         setSpeakerphoneOn(true);
-        setBluetoothScoOn(false);
         break;
       case EARPIECE:
         setSpeakerphoneOn(false);
-        setBluetoothScoOn(false);
         break;
       case WIRED_HEADSET:
         setSpeakerphoneOn(false);
-        setBluetoothScoOn(false);
         break;
       case BLUETOOTH:
         setSpeakerphoneOn(false);
@@ -397,6 +401,35 @@ public class RTCAudioManager {
     return Collections.unmodifiableSet(new HashSet<>(audioDevices));
   }
 
+  public String getCurrentOutput(){
+    ThreadUtils.checkIsOnMainThread();
+    if(audioManager.isBluetoothScoOn()){
+      bluetoothName = bluetoothManager.getBluetoothName();
+      return bluetoothName;
+    }else if(audioManager.isSpeakerphoneOn()){
+      return "Speaker";
+    }else{
+      return "Microphone";
+    }
+  }
+
+  public Set<String> getAudioNames() {
+    ThreadUtils.checkIsOnMainThread();
+    return audioNameSet;
+  }
+
+  public List<String> getDeviceNames(){
+    ThreadUtils.checkIsOnMainThread();
+    return deviceNames;
+  }
+
+  public void setListener(){
+    Log.d(TAG, "SetListener called from RTCAudioManager ");
+
+    ThreadUtils.checkIsOnMainThread();
+    updateAudioDeviceState();
+  }
+
   /** Returns the currently selected audio device. */
   public AudioDevice getSelectedAudioDevice() {
     ThreadUtils.checkIsOnMainThread();
@@ -427,7 +460,62 @@ public class RTCAudioManager {
     if(!on && isBTAvailable){
         bluetoothManager.startScoAudio();
     }
+    audioManager.setMode(AudioManager.MODE_NORMAL);
+    audioManager.stopBluetoothSco();
+    audioManager.setBluetoothScoOn(false);
     audioManager.setSpeakerphoneOn(on);
+    webRTCPlugin.listener.onChanged();
+    // updateAudioDeviceState();
+
+  }
+
+  public void setSpeakerOnFromBluetooth(){
+    boolean wasOn = audioManager.isSpeakerphoneOn();
+    if (wasOn == true) {
+      return;
+    }
+    final RTCBluetoothManager.State btManagerState = bluetoothManager.getState();
+    final boolean isBTAvailable =  
+    btManagerState == RTCBluetoothManager.State.SCO_CONNECTED
+        || btManagerState == RTCBluetoothManager.State.SCO_CONNECTING
+        || btManagerState == RTCBluetoothManager.State.HEADSET_AVAILABLE;
+    if(false && isBTAvailable){
+        bluetoothManager.startScoAudio();
+    }
+    audioManager.setMode(AudioManager.MODE_NORMAL);
+    audioManager.setSpeakerphoneOn(true);
+    audioManager.stopBluetoothSco();
+    audioManager.setBluetoothScoOn(false);
+    updateAudioNameSet();
+    if(audioManager.isSpeakerphoneOn() == true){
+      Log.d(TAG, "Speakerphone is on from setSpeakerOnFromBluetooth");
+
+    }
+    webRTCPlugin.listener.onChanged();
+    // updateAudioDeviceState();
+  }
+
+  public void setBluetoothScoOn(boolean on) {
+    boolean wasOn = audioManager.isBluetoothScoOn();
+    if (wasOn == on || on == false) {
+      return;
+    }
+
+    final RTCBluetoothManager.State btManagerState = bluetoothManager.getState();
+    final boolean isBTAvailable =  
+    btManagerState == RTCBluetoothManager.State.SCO_CONNECTED
+        || btManagerState == RTCBluetoothManager.State.SCO_CONNECTING
+        || btManagerState == RTCBluetoothManager.State.HEADSET_AVAILABLE;
+    if(on && isBTAvailable){
+      audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+      audioManager.startBluetoothSco();
+      audioManager.setBluetoothScoOn(true);
+      bluetoothManager.startScoAudio();
+    }
+    updateAudioNameSet();
+    webRTCPlugin.listener.onChanged();
+    // updateAudioDeviceState();
+
   }
 
   /** Sets the microphone mute state. */
@@ -439,31 +527,18 @@ public class RTCAudioManager {
     audioManager.setMicrophoneMute(on);
   }
 
-  //helen
-  public void setBluetoothScoOn(boolean onBluetooth){
-    System.out.println("--------RTCAudioManager.java setBluetoothScoOn");
-    boolean bluetoothOn = audioManager.isBluetoothScoOn();
-    if(bluetoothOn == onBluetooth){
-      System.out.println("Nothing is done");
-      return ;
+  public void setReceiverOn(boolean on){
+    boolean wasMuted = audioManager.isMicrophoneMute();
+    if (wasMuted) {
+      audioManager.setMicrophoneMute(false);
     }
-    final RTCBluetoothManager.State btManagerState = bluetoothManager.getState();
-    final boolean isBTAvailable =  
-    btManagerState == RTCBluetoothManager.State.SCO_CONNECTED
-        || btManagerState == RTCBluetoothManager.State.SCO_CONNECTING
-        || btManagerState == RTCBluetoothManager.State.HEADSET_AVAILABLE;
-    // if(!on && bluetoothOn){
-    //     bluetoothManager.startScoAudio();
-    //     print("RTCAudioManager.java startScoAudio 123");
-    // }
-    bluetoothManager.startScoAudio();
-    System.out.println("-------RTCAudioManager.java startScoAudio 123");
-    audioManager.setSpeakerphoneOn(!onBluetooth);
-    audioManager.setBluetoothScoOn(onBluetooth);
-    userSelectedAudioDevice = AudioDevice.BLUETOOTH;
-    updateAudioDeviceState();
-    // bluetoothManager.startScoAudio();
-    System.out.println("---------RTCAudioManager.java bluetoothManager.startScoAudio");
+    audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+    audioManager.stopBluetoothSco();
+    audioManager.setBluetoothScoOn(false);
+    audioManager.setSpeakerphoneOn(false);
+    updateAudioNameSet();
+    // updateAudioDeviceState();
+    webRTCPlugin.listener.onChanged();
   }
 
   /** Gets the current earpiece state. */
@@ -495,6 +570,19 @@ public class RTCAudioManager {
         }
       }
       return false;
+    }
+  }
+
+  public void updateAudioNameSet(){
+    audioNameSet.clear();
+    audioNameSet.add("Microphone");
+    audioNameSet.add("Speaker");
+
+    if(audioDevices.size() > 2){
+      //Have bluetooth device
+      if(bluetoothName != ""){
+        audioNameSet.add(bluetoothName);
+      }
     }
   }
 
@@ -545,6 +633,7 @@ public class RTCAudioManager {
     boolean audioDeviceSetUpdated = !audioDevices.equals(newAudioDevices);
     // Update the existing audio device set.
     audioDevices = newAudioDevices;
+
     // Correct user selected audio devices if needed.
     if (bluetoothManager.getState() == RTCBluetoothManager.State.HEADSET_UNAVAILABLE
         && userSelectedAudioDevice == AudioDevice.BLUETOOTH) {
@@ -562,7 +651,6 @@ public class RTCAudioManager {
       userSelectedAudioDevice = AudioDevice.SPEAKER_PHONE;
     }
 
-    System.out.println("----RTCAudioManager.java RTCbluetoothmanager");
     // Need to start Bluetooth if it is available and user either selected it explicitly or
     // user did not select any output device.
     boolean needBluetoothAudioStart =
@@ -597,6 +685,7 @@ public class RTCAudioManager {
       if (!bluetoothManager.startScoAudio()) {
         // Remove BLUETOOTH from list of available devices since SCO failed.
         audioDevices.remove(AudioDevice.BLUETOOTH);
+
         audioDeviceSetUpdated = true;
       }
     }
@@ -609,6 +698,9 @@ public class RTCAudioManager {
       // device. Note that it is not sufficient that a headset is available;
       // an active SCO channel must also be up and running.
       newAudioDevice = AudioDevice.BLUETOOTH;
+      
+      bluetoothName = bluetoothManager.getBluetoothName();
+      Log.d(TAG, "BluetoothName" + bluetoothName);
     } else if (hasWiredHeadset) {
       // If a wired headset is connected, but Bluetooth is not, then wired headset is used as
       // audio device.
@@ -631,7 +723,19 @@ public class RTCAudioManager {
         // Notify a listening client that audio device has been changed.
         audioManagerEvents.onAudioDeviceChanged(selectedAudioDevice, audioDevices);
       }
+
     }
+    // deviceNames.clear();
+    // for(Object x : audioDevices){
+    //   deviceNames.add(String.valueOf(x));
+    //   // audioNameSet.add(String.valueOf(x));
+    // }
+    
+    updateAudioNameSet();
+    webRTCPlugin.listener.onChanged();
+    Log.d(TAG, "My device name list" + deviceNames);
+    Log.d(TAG, "---------audioNameSet" + audioNameSet);
+    
     Log.d(TAG, "--- updateAudioDeviceState done");
   }
 }

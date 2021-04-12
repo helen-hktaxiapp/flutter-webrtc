@@ -2,6 +2,11 @@ import 'package:flutter_webrtc/src/helper.dart';
 
 typedef StreamTrackCallback = Function();
 
+class AudioDevice{
+  final String name;
+  const AudioDevice(this.name);
+}
+
 abstract class MediaStreamTrack {
   MediaStreamTrack();
 
@@ -40,10 +45,9 @@ abstract class MediaStreamTrack {
   /// Returns true if the track is muted, and false otherwise.
   bool get muted;
 
-  //helen
-  bool get onBluetooth;
-  set onBluetooth(bool onBluetooth);
+  // bool get isOn;
 
+  // set isOn(bool b);
 
   /// Returns a map containing the set of constraints most recently established
   /// for the track using a prior call to applyConstraints().
@@ -94,12 +98,37 @@ abstract class MediaStreamTrack {
     Helper.setMicrophoneMute(mute, this);
   }
 
-  void enableSpeakerphone(bool enable) {
+  void setReceiverOn(bool isMicrophoneOn){
+    print("MediaStreamTrack setReceiverOn");
     throw UnimplementedError();
   }
 
-  //helen 
-  void setBluetoothScoOn(bool onBluetooth){
+  Future<String> getCurrentOutput() async{
+    throw UnimplementedError();
+  }
+
+  Future<List<String>> getAudioDevices() async{
+    List arr = [];
+    return arr;
+  }
+
+  void enableSpeakerphone(bool enable) async {
+    print('byebye');
+    throw UnimplementedError();
+  }
+
+  void setSpeakerOnFromBluetooth() async{
+    print("setSpeakerOnFromBluetooth");
+    throw UnimplementedError();
+  }
+
+  void setBluetoothScoOn(bool isOn) async {
+    print('hihi');
+    throw UnimplementedError();
+  }
+
+  void setListener(void Function() onOutputChanged) async{
+    print("MediaStreamTrack SetListener");
     throw UnimplementedError();
   }
 

@@ -1,15 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:flutter/services.dart';
 
 import '../interface/media_stream_track.dart';
 import 'utils.dart';
 
 class MediaStreamTrackNative extends MediaStreamTrack {
-  MediaStreamTrackNative(this._trackId, this._label, this._kind, this._enabled, this._onBluetooth);
+  MediaStreamTrackNative(this._trackId, this._label, this._kind, this._enabled);
   factory MediaStreamTrackNative.fromMap(Map<dynamic, dynamic> map) {
     return MediaStreamTrackNative(
-        map['id'], map['label'], map['kind'], map['enabled'], map['on']);
+        map['id'], map['label'], map['kind'], map['enabled']);
   }
   final _channel = WebRTC.methodChannel();
   final String _trackId;
@@ -18,8 +19,7 @@ class MediaStreamTrackNative extends MediaStreamTrack {
   bool _enabled;
 
   bool _muted = false;
-  //helen
-  bool _onBluetooth = false;
+  void Function() _onOutputChanged;
 
   @override
   set enabled(bool enabled) {
@@ -48,21 +48,6 @@ class MediaStreamTrackNative extends MediaStreamTrack {
   @override
   bool get muted => _muted;
 
-  //helen
-  // @override
-  // set onBluetooth(bool onBluetooth){
-  //   _channel.invokeMethod('mediaStreamTrackSetEnable',
-  //       <String, dynamic>{'trackId': _trackId, 'on': _onBluetooth});
-  //   _onBluetooth = onBluetooth;
-
-  //   if (kind == 'audio') {
-  //     _muted = !onBluetooth;
-  //     muted ? onMute?.call() : onUnMute?.call();
-  //   }
-  // }
-  @override
-  bool get onBluetooth => _onBluetooth;
-
   @override
   Future<bool> hasTorch() => _channel.invokeMethod(
         'mediaStreamTrackHasTorch',
@@ -87,14 +72,64 @@ class MediaStreamTrackNative extends MediaStreamTrack {
     );
   }
 
-  //helen
   @override
-  void setBluetoothScoOn(bool onBluetooth) async {
-    print('MediaStreamTrack:setBluetoothScoOn $onBluetooth');
+  void setBluetoothScoOn(bool isOn) async {
+    print('MediaStreamTrack:setBluetoothScoOn $isOn');
     await _channel.invokeMethod(
       'setBluetoothScoOn',
-      <String, dynamic>{'trackId': _trackId, 'on': onBluetooth},
+      <String, dynamic>{'trackId': _trackId,},
     );
+  }
+
+  @override
+  void setReceiverOn(bool isMicrophoneOn) async {
+    print('MediaStreamTrack:setReceiver $isMicrophoneOn');
+    await _channel.invokeMethod(
+      'setReceiverOn',
+      <String, dynamic>{'trackId': _trackId,},
+    );
+  }
+
+  void setSpeakerOnFromBluetooth() async{
+    print('MediaStreamTrack:setSpeakerOnFromBluetooth');
+    await _channel.invokeMethod(
+      'setSpeakerOnFromBluetooth',
+      <String, dynamic>{'trackId': _trackId,},
+    );
+  }
+
+  Future<List<String>> getAudioDevices() async {
+    final List<dynamic> list = await _channel.invokeMethod('getAudioDevices', <String, dynamic>{'trackId': _trackId,},);
+    
+    List<String> arr = [];
+    list.forEach((data) {
+      print("hello data $data");
+      arr.add(data);
+    });
+    print("hello arr $arr");
+    return arr;
+  }
+
+  Future<String> getCurrentOutput() async{
+    final String currentOutput = await _channel.invokeMethod('getCurrentOutput', <String, dynamic>{'trackId': _trackId,},);
+    return currentOutput;
+  }
+
+  void setListener(void Function() onOutputChanged) {
+    print("mediastreamtrackimpl setLIstener called");
+    _onOutputChanged = onOutputChanged;
+    _channel.setMethodCallHandler(_methodHandle);
+  }
+
+  Future<void> _methodHandle(dynamic call) async {
+    if (_onOutputChanged == null) return;
+    switch (call.method) {
+      case "setListener":
+        print("output chanegd mediastreamtrack impl if function null or not = ${_onOutputChanged == null}");
+        return _onOutputChanged();
+      default:
+        break;
+    }
   }
 
   @override

@@ -91,7 +91,4 @@ class MediaStreamTrackWeb extends MediaStreamTrack {
   Future<void> setTorch(bool torch) {
     throw UnimplementedError('The web implementation does not support torch');
   }
-
-  @override
-  bool onBluetooth;
 }

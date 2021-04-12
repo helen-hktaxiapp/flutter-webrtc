@@ -84,8 +84,17 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
 
     void setSpeakerphoneOn(boolean on);
 
-    //helen
-    void setBluetoothScoOn(boolean onBluetooth);
+    void setBluetoothScoOn(boolean on);
+
+    void setReceiverOn(boolean on);
+
+    List getAudioDevices();
+
+    void setListener();
+
+    void setSpeakerOnFromBluetooth();
+
+    String getCurrentOutput();
   }
 
   static public final String TAG = "FlutterWebRTCPlugin";
@@ -349,17 +358,6 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
         result.success(null);
         break;
       }
-      //helen
-      // case "mediaStreamSetOn":{
-      //   String trackId = call.argument("trackId");
-      //   Boolean on = call.argument("on");
-      //   MediaStreamTrack track = getTrackForId(trackId);
-      //   if (track != null) {
-      //     track.setOn(on);
-      //   }
-      //   result.success(null);
-      //   break;
-      // }
       case "mediaStreamAddTrack": {
         String streamId = call.argument("streamId");
         String trackId = call.argument("trackId");
@@ -464,25 +462,45 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
         result.success(null);
         break;
       }
-      case "setMicrophoneMute":{
+      case "setMicrophoneMute":
         boolean mute = call.argument("mute");
         audioManager.setMicrophoneMute(mute);
         result.success(null);
         break;
-      }
-      case "enableSpeakerphone": {
+      case "enableSpeakerphone":
         boolean enable = call.argument("enable");
         audioManager.setSpeakerphoneOn(enable);
         result.success(null);
         break;
-      }
-      //helen
-      case "setBluetoothScoOn":{
-        // boolean onBluetooth = call.argument("onBluetooth");
+      case "setSpeakerOnFromBluetooth":
+        audioManager.setSpeakerOnFromBluetooth();
+        result.success(null);
+        break;
+      case "setBluetoothScoOn":
+        // boolean isOn = call.argument("isOn");
+        audioManager.setSpeakerphoneOn(false);
         audioManager.setBluetoothScoOn(true);
         result.success(null);
         break;
-      }
+      case "setReceiverOn":
+        audioManager.setReceiverOn(true);
+        result.success(null);
+        break;
+      case "getAudioDevices":
+        List audio = audioManager.getAudioDevices();
+        System.out.println("Hello" + audio);
+        result.success(audioManager.getAudioDevices());
+        break;
+      case "getCurrentOutput":
+        String currentOutput = audioManager.getCurrentOutput();
+        System.out.println("currentoutput" + currentOutput);
+        result.success(audioManager.getCurrentOutput());
+        break;
+      case "setListener":
+        System.out.println("methodcallhandlerimpl.java setlistener");
+        audioManager.setListener();
+        result.success(null); //audioManager.setListener()
+        break;
       case "getDisplayMedia": {
         Map<String, Object> constraints = call.argument("constraints");
         ConstraintsMap constraintsMap = new ConstraintsMap(constraints);
@@ -1141,18 +1159,6 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
     }
     track.setEnabled(enabled);
   }
-
-  //helen
-  // public void mediaStreamTrackSetOn(final String id, final boolean on) {
-  //   MediaStreamTrack track = localTracks.get(id);
-  //   if (track == null) {
-  //     Log.d(TAG, "mediaStreamTrackSetOn() track is null");
-  //     return;
-  //   } else if (track.on() == on) {
-  //     return;
-  //   }
-  //   track.setOn(on);
-  // }
 
   public void mediaStreamTrackSetVolume(final String id, final double volume) {
     MediaStreamTrack track = localTracks.get(id);

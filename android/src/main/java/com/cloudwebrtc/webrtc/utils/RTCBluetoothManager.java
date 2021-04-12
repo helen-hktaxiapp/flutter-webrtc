@@ -340,6 +340,7 @@ public class RTCBluetoothManager {
     // connection to be available when the method returns but instead register to receive the
     // intent ACTION_SCO_AUDIO_STATE_UPDATED and wait for the state to be SCO_AUDIO_STATE_CONNECTED.
     bluetoothState = State.SCO_CONNECTING;
+    audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
     audioManager.startBluetoothSco();
     audioManager.setBluetoothScoOn(true);
     scoConnectionAttempts++;
@@ -395,6 +396,17 @@ public class RTCBluetoothManager {
               + ", SCO audio=" + bluetoothHeadset.isAudioConnected(bluetoothDevice));
     }
     Log.d(TAG, "updateDevice done: BT state=" + bluetoothState);
+  }
+
+  public String getBluetoothName(){
+    List<BluetoothDevice> devices = bluetoothHeadset.getConnectedDevices();
+    String bluetoothName = "";
+    if (!devices.isEmpty()){
+      bluetoothName = bluetoothDevice.getName();
+    }
+    Log.d(TAG, "BluetoothName" + bluetoothName);
+    return bluetoothName;
+
   }
 
   /**
@@ -490,6 +502,8 @@ public class RTCBluetoothManager {
       }
     }
     if (scoConnected) {
+      System.out.println("RTCBluetoothManager.java bluetooth timeout scoConnected");
+      startScoAudio();
       // We thought BT had timed out, but it's actually on; updating state.
       bluetoothState = State.SCO_CONNECTED;
       scoConnectionAttempts = 0;
