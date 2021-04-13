@@ -327,6 +327,14 @@ public class RTCBluetoothManager {
     List<BluetoothDevice> devices = bluetoothHeadset.getConnectedDevices();
     if (!devices.isEmpty()) {
       bluetoothDevice = devices.get(0);
+      String bluetoothName0 = bluetoothDevice.getName();
+      Log.d(TAG, "ccc1 bluetoothDevice = " + bluetoothName0 + "apprtcaudiomanager.bluetoothname" + apprtcAudioManager.bluetoothName);
+
+      if(!bluetoothName0.equals(apprtcAudioManager.bluetoothName)){
+        Log.d(TAG, "ccc2 bluetoothDevice = " + bluetoothName0 + "apprtcaudiomanager.bluetoothname" + apprtcAudioManager.bluetoothName);
+        // updateAudioDeviceState();
+      }
+      //Check with current output or apprtcaudiomanager output name
       bluetoothState = State.HEADSET_AVAILABLE;
     } 
     
@@ -389,6 +397,13 @@ public class RTCBluetoothManager {
     } else {
       // Always use first device in list. Android only supports one device.
       bluetoothDevice = devices.get(0);
+      String bluetoothName0 = bluetoothDevice.getName();
+      Log.d(TAG, "ccc3 bluetoothDevice = " + bluetoothName0 + "apprtcaudiomanager.bluetoothname" + apprtcAudioManager.bluetoothName);
+
+      if(!bluetoothName0.equals(apprtcAudioManager.bluetoothName)){
+        Log.d(TAG, "ccc4 bluetoothDevice = " + bluetoothName0 + "apprtcaudiomanager.bluetoothname" + apprtcAudioManager.bluetoothName);
+        // updateAudioDeviceState();
+      }
       bluetoothState = State.HEADSET_AVAILABLE;
       Log.d(TAG, "Connected bluetooth headset: "
               + "name=" + bluetoothDevice.getName() + ", "
