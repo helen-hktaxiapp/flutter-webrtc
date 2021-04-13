@@ -48,8 +48,8 @@ public class RTCAudioManager {
   public enum AudioDevice { SPEAKER_PHONE, WIRED_HEADSET, EARPIECE, BLUETOOTH, NONE }
   public List <String> deviceNames = new ArrayList<String>();
   public LinkedHashSet<String> audioNameSet = new LinkedHashSet<String>(){{
-    add("Microphone");
-    add("Speaker");
+    add("microphone");
+    add("speaker");
   }};
   // public Set<String> audioNameSet = new HashSet<String>(){{
   //   add("Microphone");
@@ -302,8 +302,8 @@ public class RTCAudioManager {
     registerReceiver(wiredHeadsetReceiver, new IntentFilter(Intent.ACTION_HEADSET_PLUG));
     Log.d(TAG, "AudioManager started");
     audioNameSet.clear();
-    audioNameSet.add("Microphone");
-    audioNameSet.add("Speaker");
+    audioNameSet.add("microphone");
+    audioNameSet.add("speaker");
   }
 
   @SuppressWarnings("deprecation") // TODO(henrika): audioManager.abandonAudioFocus() is deprecated.
@@ -410,11 +410,11 @@ public class RTCAudioManager {
     ThreadUtils.checkIsOnMainThread();
     if(audioManager.isBluetoothScoOn()){
       // bluetoothName = bluetoothManager.getBluetoothName();
-      return "Bluetooth";
+      return "bluetooth";
     }else if(audioManager.isSpeakerphoneOn()){
-      return "Speaker";
+      return "speaker";
     }else{
-      return "Microphone";
+      return "microphone";
     }
   }
 
@@ -608,15 +608,15 @@ public class RTCAudioManager {
 
   public void updateAudioNameSet(){
     audioNameSet.clear();
-    audioNameSet.add("Microphone");
-    audioNameSet.add("Speaker");
+    audioNameSet.add("microphone");
+    audioNameSet.add("speaker");
 
     if(audioDevices.size() > 2){
       //Have bluetooth device
       // if(bluetoothName != ""){
       //   audioNameSet.add(bluetoothName);
       // }
-      audioNameSet.add("Bluetooth");
+      audioNameSet.add("bluetooth");
     }
   }
 
