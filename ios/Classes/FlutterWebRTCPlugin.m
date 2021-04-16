@@ -76,6 +76,7 @@
     self.renders = [[NSMutableDictionary alloc] init];
 #if TARGET_OS_IPHONE
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didSessionRouteChange:) name:AVAudioSessionRouteChangeNotification object:nil];
+    
 #endif
     return self;
 }
@@ -85,12 +86,61 @@
 #if TARGET_OS_IPHONE
   NSDictionary *interuptionDict = notification.userInfo;
   NSInteger routeChangeReason = [[interuptionDict valueForKey:AVAudioSessionRouteChangeReasonKey] integerValue];
-
+  NSLog(@"iOS invoke inputchanged");
+  [_methodChannel invokeMethod:@"setListener" arguments: nil];
+    
   switch (routeChangeReason) {
+          
       case AVAudioSessionRouteChangeReasonCategoryChange: {
+          NSLog(@"avaudiosessionroutechangereason categorychange");
           NSError* error;
           [[AVAudioSession sharedInstance] overrideOutputAudioPort:_speakerOn? AVAudioSessionPortOverrideSpeaker : AVAudioSessionPortOverrideNone error:&error];
+          
+          
+          
+//          AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+//        NSArray* inputs = [audioSession availableInputs];
+//        for (AVAudioSessionPortDescription* port in inputs){
+//            if([port.portType isEqualToString:AVAudioSessionPortBuiltInMic] || [port.portType isEqualToString:AVAudioSessionPortBuiltInReceiver]){
+//                [audioSession setPreferredInput:port error: nil];
+//                NSLog(@"set preferred input to receiver");
+//            }
+//        }
+          
       }
+          
+//      case AVAudioSessionRouteChangeReasonOldDeviceUnavailable:{
+//          AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+////          NSArray* inputs = [audioSession availableInputs];
+////          for (AVAudioSessionPortDescription* port in inputs){
+////              if([port.portType isEqualToString:AVAudioSessionPortBuiltInMic] || [port.portType isEqualToString:AVAudioSessionPortBuiltInReceiver]){
+////                  [audioSession setPreferredInput:port error:nil];
+////                  NSLog(@"set preferred input to receiver");
+////              }
+////          }
+//          [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord
+//                        withOptions: 0
+//                          error:nil];
+//          [audioSession setActive:YES error:nil];
+//          NSLog(@"old device unavailable");
+//      }
+//      case AVAudioSessionRouteChangeReasonUnknown:{
+//          AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+////          NSArray* inputs = [audioSession availableInputs];
+////          for (AVAudioSessionPortDescription* port in inputs){
+////              if([port.portType isEqualToString:AVAudioSessionPortBuiltInMic] || [port.portType isEqualToString:AVAudioSessionPortBuiltInReceiver]){
+////                  [audioSession setPreferredInput:port error:nil];
+////                  NSLog(@"set preferred input to receiver");
+////              }
+////          }
+//          [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord
+//                        withOptions: 0
+//                          error:nil];
+//          [audioSession setActive:YES error:nil];
+//          NSLog(@"change reason unknown");
+//      }
+
+
       break;
 
     default:
@@ -370,6 +420,7 @@
         NSDictionary* argsMap = call.arguments;
         NSString* trackId = argsMap[@"trackId"];
         NSNumber* enabled = argsMap[@"enabled"];
+        NSLog(@"iiii mute mic");
         RTCMediaStreamTrack *track = self.localTracks[trackId];
         if(track != nil){
             track.isEnabled = enabled.boolValue;
@@ -546,6 +597,7 @@
         NSDictionary* argsMap = call.arguments;
         NSString* trackId = argsMap[@"trackId"];
         NSNumber* mute = argsMap[@"mute"];
+        NSLog(@"iiii setMicrophoneMute");
         RTCMediaStreamTrack *track = self.localTracks[trackId];
         if (track != nil && [track isKindOfClass:[RTCAudioTrack class]]) {
             RTCAudioTrack *audioTrack = (RTCAudioTrack *)track;
@@ -557,6 +609,7 @@
         NSDictionary* argsMap = call.arguments;
         NSNumber* enable = argsMap[@"enable"];
         _speakerOn = enable.boolValue;
+        NSLog(@"iiii enableSpeakerphone");
         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
         [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord
                       withOptions:_speakerOn ? AVAudioSessionCategoryOptionDefaultToSpeaker 
@@ -568,7 +621,127 @@
 #else
         result(FlutterMethodNotImplemented);
 #endif
-    } else if ([@"getLocalDescription" isEqualToString:call.method]) {
+    } else if ([@"setBluetoothScoOn" isEqualToString:call.method]) {
+#if TARGET_OS_IPHONE
+        NSLog(@"iiii setBluetoothScoOn");
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+        [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord
+                      withOptions:AVAudioSessionCategoryOptionAllowBluetooth|AVAudioSessionCategoryOptionAllowBluetoothA2DP
+                        error:nil];
+        [audioSession setActive:YES error:nil];
+        
+        
+//        NSArray* inputs = [audioSession availableInputs];
+//        NSLog(@"iiii inputs: '%@'",inputs);
+//        for (AVAudioSessionPortDescription* port in inputs){
+//            if( [port.portType isEqualToString:AVAudioSessionPortBluetoothA2DP] || [port.portType isEqualToString:AVAudioSessionPortBluetoothHFP] || [port.portType isEqualToString:AVAudioSessionPortBluetoothLE] ){
+//                [audioSession setPreferredInput:port error:nil];
+//            }
+//        }
+        
+//        BOOL success;
+//        NSArray* outputs = [audioSession outputDataSources];
+//         for(AVAudioSessionDataSourceDescription* port in outputs){
+//            [audioSession setOutputDataSource:port error:nil];
+//             NSLog(@"iiii output port: '%@'",port);
+//         }
+//        success = [audioSession overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
+        
+        result(nil);
+#else
+        result(FlutterMethodNotImplemented);
+#endif
+    }else if ([@"setReceiverOn" isEqualToString:call.method]) {
+#if TARGET_OS_IPHONE
+        NSLog(@"iiii setReceiverOn");
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+//        [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord
+//                      withOptions: 0
+//                        error:nil];
+//        [audioSession setActive:YES error:nil];
+        
+        NSArray* inputs = [audioSession availableInputs];
+        NSLog(@"iiii inputs: '%@'",inputs);
+        for (AVAudioSessionPortDescription* port in inputs){
+            if([port.portType isEqualToString:AVAudioSessionPortBuiltInMic] || [port.portType isEqualToString:AVAudioSessionPortBuiltInReceiver]){
+                [audioSession setPreferredInput:port error:nil];
+            }
+        }
+        result(nil);
+#else
+        result(FlutterMethodNotImplemented);
+#endif
+     } else if ([@"setSpeakerOnFromBluetooth" isEqualToString:call.method]) {
+ #if TARGET_OS_IPHONE
+         NSLog(@"iiii setSpeakerOnFromBluetooth");
+//         BOOL success;
+         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+//         [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord
+//                       withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker
+//                         error:nil];
+//         [audioSession setActive:YES error:nil];
+         
+//         NSArray* outputs = [audioSession outputDataSources];
+//         NSLog(@"iiii outputs: '%@'",outputs);
+//         for(AVAudioSessionDataSourceDescription* port in outputs){
+////             if([port.portType isEqualToString: AVAudioSessionPortBuiltInSpeaker]){
+////                 [audioSession setOutputDataSource:port error:nil];
+////             }
+//             NSLog(@"iiii output port: '%@'",port);
+//         }
+         [audioSession overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
+         NSLog(@"override speaker");
+         result(nil);
+ #else
+         result(FlutterMethodNotImplemented);
+ #endif
+     } else if ([@"getAudioDevices" isEqualToString:call.method]) {
+ #if TARGET_OS_IPHONE
+         NSLog(@"iiii getAudioDevices");
+         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+         NSArray* inputs = [audioSession availableInputs];
+         NSLog(@"iiii inputs: '%@'",inputs);
+         NSMutableArray *availableDevices = [NSMutableArray arrayWithObjects:@"microphone",@"speaker",nil];
+         for (AVAudioSessionPortDescription* port in inputs){
+             if( [port.portType isEqualToString:AVAudioSessionPortBluetoothA2DP] || [port.portType isEqualToString:AVAudioSessionPortBluetoothHFP] || [port.portType isEqualToString:AVAudioSessionPortBluetoothLE] ){
+                 NSString *bluetoothString = @"bluetooth";
+                 [availableDevices addObject:bluetoothString];
+             }
+         }
+         NSLog(@"iiii audioDevices: '%@'",availableDevices);
+         result(availableDevices);
+ #else
+         result(FlutterMethodNotImplemented);
+ #endif
+     }else if ([@"getCurrentOutput" isEqualToString:call.method]) {
+ #if TARGET_OS_IPHONE
+         NSLog(@"iiii getCurrentOutput");
+         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+         NSArray *currentOutputs = audioSession.currentRoute.outputs;
+         NSString *currentOutput = [NSString new];
+//         currentOutput = audioSession.outputDataSource.dataSourceName;
+//         if([currentOutputs[0].type isEqualToString: @"BluetoothHFP"]){
+//             currentOutput = @"bluetooth";
+//         }
+         
+         for( AVAudioSessionPortDescription *port in currentOutputs ){
+             if([port.portType isEqualToString:AVAudioSessionPortBluetoothA2DP]|| [port.portType isEqualToString:AVAudioSessionPortBluetoothHFP] || [port.portType isEqualToString:AVAudioSessionPortBluetoothLE] ){
+                 currentOutput = @"bluetooth";
+             }else if([port.portType isEqualToString:AVAudioSessionPortBuiltInMic] || [port.portType isEqualToString:AVAudioSessionPortBuiltInReceiver]){
+                 currentOutput = @"microphone";
+             }else if([port.portType isEqualToString: AVAudioSessionPortBuiltInSpeaker]){
+                 currentOutput = @"speaker";
+             }else{
+                 currentOutput = @"else";
+             }
+         }
+         NSLog(@"current output%@",currentOutput);
+         NSLog(@"iiii audioDevices: '%@'",currentOutputs);
+         result(currentOutput);
+ #else
+         result(FlutterMethodNotImplemented);
+ #endif
+    }else if ([@"getLocalDescription" isEqualToString:call.method]) {
         NSDictionary* argsMap = call.arguments;
         NSString* peerConnectionId = argsMap[@"peerConnectionId"];
         RTCPeerConnection *peerConnection = self.peerConnections[peerConnectionId];
