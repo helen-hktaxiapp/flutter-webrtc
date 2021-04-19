@@ -699,20 +699,22 @@
  #if TARGET_OS_IPHONE
          NSLog(@"iiii getAudioDevices");
          AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-        //  NSArray* inputs = [audioSession availableInputs];
-        //  NSLog(@"iiii inputs: '%@'",inputs);
+         NSArray* inputs = [audioSession availableInputs];
+         NSLog(@"iiii inputs: '%@'",inputs);
          NSMutableArray *availableDevices = [NSMutableArray arrayWithObjects:@"microphone",@"speaker",nil];
-        //  for (AVAudioSessionPortDescription* port in inputs){
-        //      if( [port.portType isEqualToString:AVAudioSessionPortBluetoothA2DP] || [port.portType isEqualToString:AVAudioSessionPortBluetoothHFP] || [port.portType isEqualToString:AVAudioSessionPortBluetoothLE] ){
-        //          NSString *bluetoothString = @"bluetooth";
-        //          [availableDevices addObject:bluetoothString];
-        //      }
-        //  }
+        
         NSArray *currentOutputs = audioSession.currentRoute.outputs;
          for( AVAudioSessionPortDescription *port in currentOutputs ){
              if([port.portType isEqualToString:AVAudioSessionPortBluetoothA2DP]|| [port.portType isEqualToString:AVAudioSessionPortBluetoothHFP] || [port.portType isEqualToString:AVAudioSessionPortBluetoothLE] ){
                 NSString *bluetoothString = @"bluetooth";
                 [availableDevices addObject:bluetoothString];
+             }else{
+                for (AVAudioSessionPortDescription* port in inputs){
+                    if( [port.portType isEqualToString:AVAudioSessionPortBluetoothA2DP] || [port.portType isEqualToString:AVAudioSessionPortBluetoothHFP] || [port.portType isEqualToString:AVAudioSessionPortBluetoothLE] ){
+                        NSString *bluetoothString = @"bluetooth";
+                        [availableDevices addObject:bluetoothString];
+                    }
+                }
              }
          }
          NSLog(@"iiii audioDevices: '%@'",availableDevices);
