@@ -93,8 +93,8 @@
           
       case AVAudioSessionRouteChangeReasonCategoryChange: {
           NSLog(@"avaudiosessionroutechangereason categorychange");
-          NSError* error;
-          [[AVAudioSession sharedInstance] overrideOutputAudioPort:_speakerOn? AVAudioSessionPortOverrideSpeaker : AVAudioSessionPortOverrideNone error:&error];
+//          NSError* error;
+//          [[AVAudioSession sharedInstance] overrideOutputAudioPort:_speakerOn? AVAudioSessionPortOverrideSpeaker : AVAudioSessionPortOverrideNone error:&error];
           
           
           
@@ -611,12 +611,17 @@
         _speakerOn = enable.boolValue;
         NSLog(@"iiii enableSpeakerphone");
         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-        [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord
-                      withOptions:_speakerOn ? AVAudioSessionCategoryOptionDefaultToSpeaker 
-                      : 
-                      AVAudioSessionCategoryOptionAllowBluetooth|AVAudioSessionCategoryOptionAllowBluetoothA2DP
-                        error:nil];
+//        [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord
+//                      withOptions:_speakerOn ? AVAudioSessionCategoryOptionDefaultToSpeaker
+//                      :
+//                      AVAudioSessionCategoryOptionAllowBluetooth|AVAudioSessionCategoryOptionAllowBluetoothA2DP
+//                        error:nil];
+        
+        
+        [audioSession overrideOutputAudioPort: _speakerOn ? AVAudioSessionPortOverrideSpeaker: AVAudioSessionPortOverrideNone error:nil];
+        
         [audioSession setActive:YES error:nil];
+        
         result(nil);
 #else
         result(FlutterMethodNotImplemented);
@@ -675,11 +680,23 @@
  #if TARGET_OS_IPHONE
          NSLog(@"iiii setSpeakerOnFromBluetooth");
 //         BOOL success;
-         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-//         [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord
-//                       withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker
-//                         error:nil];
-//         [audioSession setActive:YES error:nil];
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+//        BOOL success;
+//        NSError* error;
+         
+         
+        // [audioSession setMode:AVAudioSessionModeVoiceChat error: nil];
+        // [audioSession overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:nil];
+        // [audioSession setActive:NO error:nil];
+
+
+
+
+//        success = [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord
+//                      withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker
+//                        error: &error];
+//        if (!success) NSLog(@"AVAudioSession error activating speaker: %@",error);
+//         NSLog(@"Success123 change output to speaker - %@",success ? @"TRUE":@"FALSE");
          
 //         NSArray* outputs = [audioSession outputDataSources];
 //         NSLog(@"iiii outputs: '%@'",outputs);
@@ -689,7 +706,14 @@
 ////             }
 //             NSLog(@"iiii output port: '%@'",port);
 //         }
+
+
+
          [audioSession overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
+
+
+
+//        [audioSession setActive:YES error:nil];
          NSLog(@"override speaker");
          result(nil);
  #else
