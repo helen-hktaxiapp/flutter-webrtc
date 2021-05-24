@@ -21,6 +21,7 @@ class MediaRecorderNative extends MediaRecorder {
     }
 
     if (audioChannel == null && videoTrack == null) {
+      print("No Audio Channel or video track.");
       throw Exception('Neither audio nor video track were provided');
     }
 

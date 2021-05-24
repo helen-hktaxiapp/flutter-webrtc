@@ -89,7 +89,7 @@ class _GetUserMediaSampleState extends State<GetUserMediaSample> {
 
   void _startRecording() async {
     if (Platform.isIOS) {
-      print('Recording is not available on iOS');
+      print('Recording is not available on iOS'); 
       return;
     }
     // TODO(rostopira): request write storage permission
