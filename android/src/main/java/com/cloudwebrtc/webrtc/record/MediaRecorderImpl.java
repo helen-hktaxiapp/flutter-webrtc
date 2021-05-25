@@ -68,6 +68,7 @@ public class MediaRecorderImpl {
                 // throw new Exception("Audio-only recording not implemented yet");
                 Log.d(TAG, "MediaRecorder123");
                 initRecording();
+                startAudioRecord();
             }
         }
     }
