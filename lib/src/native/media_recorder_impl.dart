@@ -19,6 +19,7 @@ class MediaRecorderNative extends MediaRecorder {
     if (path == null) {
       throw ArgumentError.notNull('path');
     }
+    print("MediaRecorderNative start");
 
     if (audioChannel == null && videoTrack == null) {
       print("No Audio Channel or video track.");

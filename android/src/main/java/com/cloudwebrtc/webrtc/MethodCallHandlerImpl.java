@@ -511,6 +511,7 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
         //This method can a lot of different exceptions
         //so we should notify plugin user about them
         try {
+          print("Startrecordtofile1231");
           String path = call.argument("path");
           VideoTrack videoTrack = null;
           String videoTrackId = call.argument("videoTrackId");
@@ -527,9 +528,11 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
           }
           Integer recorderId = call.argument("recorderId");
           if (videoTrack != null || audioChannel != null) {
+            print("Startrecordtofile1232");
             getUserMediaImpl.startRecordingToFile(path, recorderId, videoTrack, audioChannel);
             result.success(null);
           } else {
+            print("StartRecordToFile1233");
             resultError("startRecordToFile", "No tracks", result);
           }
         } catch (Exception e) {
