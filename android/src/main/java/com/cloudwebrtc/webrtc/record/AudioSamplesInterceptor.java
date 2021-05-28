@@ -28,6 +28,7 @@ public class AudioSamplesInterceptor implements SamplesReadyCallback {
     }
 
     public void detachCallback(Integer id) {
+        Log.d(TAG, "AudioSamplesInterceptor detachCallback");
         callbacks.remove(id);
     }
 

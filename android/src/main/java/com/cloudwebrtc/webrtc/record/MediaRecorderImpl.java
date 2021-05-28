@@ -22,6 +22,8 @@ import org.webrtc.ThreadUtils;
 import org.webrtc.audio.JavaAudioDeviceModule.SamplesReadyCallback;
 import android.os.Process;
 import java.lang.System;
+import java.io.File;
+import java.io.FileOutputStream;
 
 
 public class MediaRecorderImpl {
@@ -68,7 +70,7 @@ public class MediaRecorderImpl {
                 // throw new Exception("Audio-only recording not implemented yet");
                 Log.d(TAG, "MediaRecorder123");
                 initRecording();
-                startAudioRecord();
+                startAudioRecord(audioInterceptor);
             }
         }
     }
@@ -132,11 +134,13 @@ public class MediaRecorderImpl {
         // return framesPerBuffer;
     }
 
-    private boolean startAudioRecord() {
+    private boolean startAudioRecord(AudioSamplesInterceptor audioSampleInterceptor) {
         Log.d(TAG, "startRecording");
         assertTrue(audioRecord != null);
         assertTrue(audioThread == null);
         try {
+          Log.d(TAG, "audioSampleInterceptor.write()");
+          audioSampleInterceptor.write();
           audioRecord.startRecording();
         } catch (IllegalStateException e) {
             Log.d(TAG,
@@ -149,7 +153,8 @@ public class MediaRecorderImpl {
               + audioRecord.getRecordingState());
           return false;
         }
-        audioThread = new AudioRecordThread("AudioRecordJavaThread");
+        // audioThread = new AudioRecordThread("AudioRecordJavaThread");
+        audioThread = new Thread(new RecordingRunnable(), "Recording Thread");
         audioThread.start();
         return true;
     }
@@ -173,9 +178,13 @@ public class MediaRecorderImpl {
     public File getRecordFile() { return recordFile; }
 
     public void stopRecording() {
+        Log.d(TAG, "stopRecording");
+
         isRunning = false;
-        if (audioInterceptor != null)
-            audioInterceptor.detachCallback(id);
+        if (audioInterceptor != null){
+          Log.d(TAG, "audioInterceptor detachCallback but not null");
+          audioInterceptor.detachCallback(id);
+        }
         if (videoTrack != null && videoFileRenderer != null) {
             videoTrack.removeSink(videoFileRenderer);
             videoFileRenderer.release();
@@ -266,5 +275,43 @@ public class MediaRecorderImpl {
             keepAlive = false;
         }
     }
+
+    private class RecordingRunnable implements Runnable {
+
+      @Override
+      public void run() {
+          final File file = new File(Environment.getExternalStorageDirectory(), "recording.pcm");
+          final ByteBuffer buffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
+
+          try (final FileOutputStream outStream = new FileOutputStream(file)) {
+              while (recordingInProgress.get()) {
+                  int result = recorder.read(buffer, BUFFER_SIZE);
+                  if (result < 0) {
+                      throw new RuntimeException("Reading of audio buffer failed: " +
+                              getBufferReadFailureReason(result));
+                  }
+                  outStream.write(buffer.array(), 0, BUFFER_SIZE);
+                  buffer.clear();
+              }
+          } catch (IOException e) {
+              throw new RuntimeException("Writing of recorded audio failed", e);
+          }
+      }
+
+      private String getBufferReadFailureReason(int errorCode) {
+          switch (errorCode) {
+              case AudioRecord.ERROR_INVALID_OPERATION:
+                  return "ERROR_INVALID_OPERATION";
+              case AudioRecord.ERROR_BAD_VALUE:
+                  return "ERROR_BAD_VALUE";
+              case AudioRecord.ERROR_DEAD_OBJECT:
+                  return "ERROR_DEAD_OBJECT";
+              case AudioRecord.ERROR:
+                  return "ERROR";
+              default:
+                  return "Unknown (" + errorCode + ")";
+          }
+      }
+  }
 }
 
