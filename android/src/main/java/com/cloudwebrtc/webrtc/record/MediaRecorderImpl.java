@@ -38,7 +38,8 @@ public class MediaRecorderImpl {
     private ByteBuffer byteBuffer;
     private byte[] emptyBytes;
     private static final int BUFFER_SIZE_FACTOR = 2;
-    private @Nullable AudioRecordThread audioThread = null;
+    // private @Nullable AudioRecordThread audioThread = null;
+    private Thread audioThread = null;
 
 
     public MediaRecorderImpl(Integer id, @Nullable VideoTrack videoTrack, @Nullable AudioSamplesInterceptor audioInterceptor) {
@@ -281,6 +282,8 @@ public class MediaRecorderImpl {
       @Override
       public void run() {
           final File file = new File(Environment.getExternalStorageDirectory(), "recording.pcm");
+          System.out.println("External pathh" + Environment.getExternalStorageDirectory() );
+          Log.d("externalpath" + Environment.getExternalStorageDirectory() );
           final ByteBuffer buffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
 
           try (final FileOutputStream outStream = new FileOutputStream(file)) {
