@@ -44,7 +44,8 @@ public class MediaRecorderImpl {
             Log.e(TAG, "Video track is null");
             if (audioInterceptor != null) {
                 //TODO(rostopira): audio only recording
-                throw new Exception("Audio-only recording not implemented yet");
+                // throw new Exception("Audio-only recording not implemented yet");
+                System.out.println("Audio only recording");
             }
         }
     }
