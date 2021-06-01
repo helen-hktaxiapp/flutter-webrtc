@@ -76,7 +76,7 @@ import android.util.Log;
 import com.cloudwebrtc.webrtc.utils.EglUtils;
 
 import org.webrtc.VideoTrack;
-
+import java.io.*;
 import java.io.File;
 
 import java.nio.ByteBuffer;
@@ -110,6 +110,7 @@ public class MediaRecorderImpl {
     private static final int BUFFER_SIZE_FACTOR = 2;
     // private @Nullable AudioRecordThread audioThread = null;
     private Thread audioThread = null;
+    
 
 
     public MediaRecorderImpl(Integer id, @Nullable VideoTrack videoTrack, @Nullable AudioSamplesInterceptor audioInterceptor) {
@@ -150,11 +151,11 @@ public class MediaRecorderImpl {
         }
     }
 
-    private void byteArrayToFile(){
-      try (FileOutputStream stream = new FileOutputStream(path)) {
-        stream.write(bytes);
-      }
-    }
+    // private void byteArrayToFile(){
+    //   try (FileOutputStream stream = new FileOutputStream(path)) {
+    //     stream.write(bytes);
+    //   }
+    // }
     
     private void initRecording(){
         //REFERENCE TO APPRTCMOBILE GITHUB https://github.com/jianrong-rtc/AppRTCMobile.git
@@ -277,7 +278,7 @@ public class MediaRecorderImpl {
     private boolean stopAudioRecord() {
         Log.d(TAG, "stopRecording");
         assertTrue(audioThread != null);
-        audioThread.stopThread();
+        audioThread.stop();
         // if (!ThreadUtils.joinUninterruptibly(audioThread, AUDIO_RECORD_THREAD_JOIN_TIMEOUT_MS)) {
         //     Log.e(TAG, "Join of AudioRecordJavaThread timed out");
         //     WebRtcAudioUtils.logAudioState(TAG);
@@ -361,13 +362,13 @@ public class MediaRecorderImpl {
 
       @Override
       public void run() {
-          final File file = new File(Environment.getExternalStorageDirectory(), "recording.pcm");
-          System.out.println("External pathh" + Environment.getExternalStorageDirectory() );
-          Log.d("externalpath" + Environment.getExternalStorageDirectory() );
-          final ByteBuffer buffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
-
+          final File file = new File("/storage/emulated/0/Android/data/com.cornermation.calltaxi/files/webrtc_android", "recording.mp4");
+        //   System.out.println("External pathh" + Environment.getExternalStorageDirectory() );
+        //   Log.d("externalpath" + Environment.getExternalStorageDirectory() );
+          final ByteBuffer buffer = ByteBuffer.allocateDirect(bytesPerFrame * framesPerBuffer);
+          var BUFFER_SIZE = bytesPerFrame * framesPerBuffer;
           try (final FileOutputStream outStream = new FileOutputStream(file)) {
-              while (recordingInProgress.get()) {
+              while (isRunning) {
                   int result = recorder.read(buffer, BUFFER_SIZE);
                   if (result < 0) {
                       throw new RuntimeException("Reading of audio buffer failed: " +
