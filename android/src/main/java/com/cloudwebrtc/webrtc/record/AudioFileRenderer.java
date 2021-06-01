@@ -45,11 +45,15 @@ public class AudioFileRenderer implements JavaAudioDeviceModule.SamplesReadyCall
 
         mediaMuxer = new MediaMuxer(outputFile.getPath(),
                 MUXER_OUTPUT_MPEG_4);
+        System.out.println("try123audio 1");
+
     }
 
     @Override
     public void onWebRtcAudioRecordSamplesReady(JavaAudioDeviceModule.AudioSamples audioSamples) {
         audioThreadHandler.post(() -> {
+            System.out.println("try123audio 2");
+
             if (audioEncoder == null) try {
                 audioEncoder = MediaCodec.createEncoderByType("audio/mp4a-latm");
                 MediaFormat format = new MediaFormat();
@@ -73,12 +77,15 @@ public class AudioFileRenderer implements JavaAudioDeviceModule.SamplesReadyCall
                 buffer.put(data);
                 audioEncoder.queueInputBuffer(bufferIndex, 0, data.length, presTime, 0);
                 presTime += data.length * 125 / 12; // 1000000 microseconds / 48000hz / 2 bytes
+                System.out.println("try123audio 3");
+
             }
             drainAudio();
         });
     }
 
     private void drainAudio() {
+        System.out.println("try123audio 4");
         if (audioBufferInfo == null)
             audioBufferInfo = new MediaCodec.BufferInfo();
         while (true) {
@@ -105,6 +112,8 @@ public class AudioFileRenderer implements JavaAudioDeviceModule.SamplesReadyCall
                 Log.d(TAG, "unexpected result fr om encoder.dequeueOutputBuffer: " + encoderStatus);
             } else { // encoderStatus >= 0
                 try {
+                    System.out.println("try123audio 5");
+
                     ByteBuffer encodedData = audioOutputBuffers[encoderStatus];
                     if (encodedData == null) {
                         Log.e(TAG, "encoderOutputBuffer " + encoderStatus + " was null");
@@ -135,6 +144,7 @@ public class AudioFileRenderer implements JavaAudioDeviceModule.SamplesReadyCall
         isRunning = false;
         if (audioThreadHandler != null)
             audioThreadHandler.post(() -> {
+                System.out.println("try123audio 6");
                 if (audioEncoder != null) {
                     audioEncoder.stop();
                     audioEncoder.release();
@@ -149,6 +159,6 @@ public class AudioFileRenderer implements JavaAudioDeviceModule.SamplesReadyCall
 
                 // result.success(null);
             });
-        drainAudio();
+        // drainAudio();
     }
 }

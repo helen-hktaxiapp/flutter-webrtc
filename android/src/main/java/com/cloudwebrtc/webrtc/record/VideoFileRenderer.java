@@ -51,6 +51,7 @@ class VideoFileRenderer implements VideoSink, SamplesReadyCallback {
     private MediaCodec audioEncoder;
 
     VideoFileRenderer(String outputFile, final EglBase.Context sharedContext, boolean withAudio) throws IOException {
+        System.out.println("try123 2");
         renderThread = new HandlerThread(TAG + "RenderThread");
         renderThread.start();
         renderThreadHandler = new Handler(renderThread.getLooper());
@@ -75,6 +76,8 @@ class VideoFileRenderer implements VideoSink, SamplesReadyCallback {
     }
 
     private void initVideoEncoder() {
+        System.out.println("try123 3");
+
         MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, outputFileWidth, outputFileHeight);
 
         // Set some properties.  Failing to specify some of these can cause the MediaCodec
@@ -104,6 +107,8 @@ class VideoFileRenderer implements VideoSink, SamplesReadyCallback {
 
     @Override
     public void onFrame(VideoFrame frame) {
+        System.out.println("try123 4");
+
         frame.retain();
         if (outputFileWidth == -1) {
             outputFileWidth = frame.getRotatedWidth();
@@ -114,6 +119,8 @@ class VideoFileRenderer implements VideoSink, SamplesReadyCallback {
     }
 
     private void renderFrameOnRenderThread(VideoFrame frame) {
+        System.out.println("try123 5");
+
         if (frameDrawer == null) {
             frameDrawer = new VideoFrameDrawer();
         }
@@ -127,6 +134,8 @@ class VideoFileRenderer implements VideoSink, SamplesReadyCallback {
      * Release all resources. All already posted frames will be rendered first.
      */
     void release() {
+        System.out.println("try123 6");
+
         isRunning = false;
         if (audioThreadHandler != null)
             audioThreadHandler.post(() -> {
@@ -153,6 +162,8 @@ class VideoFileRenderer implements VideoSink, SamplesReadyCallback {
     private long videoFrameStart = 0;
 
     private void drainEncoder() {
+        System.out.println("try123 7");
+
         if (!encoderStarted) {
             encoder.start();
             encoderOutputBuffers = encoder.getOutputBuffers();
@@ -183,6 +194,8 @@ class VideoFileRenderer implements VideoSink, SamplesReadyCallback {
                 Log.e(TAG, "unexpected result fr om encoder.dequeueOutputBuffer: " + encoderStatus);
             } else { // encoderStatus >= 0
                 try {
+                    System.out.println("try123 8");
+
                     ByteBuffer encodedData = encoderOutputBuffers[encoderStatus];
                     if (encodedData == null) {
                         Log.e(TAG, "encoderOutputBuffer " + encoderStatus + " was null");
@@ -213,6 +226,8 @@ class VideoFileRenderer implements VideoSink, SamplesReadyCallback {
     private long presTime = 0L;
 
     private void drainAudio() {
+        System.out.println("try123 9");
+
         if (audioBufferInfo == null)
             audioBufferInfo = new MediaCodec.BufferInfo();
         while (true) {
@@ -267,6 +282,8 @@ class VideoFileRenderer implements VideoSink, SamplesReadyCallback {
         if (!isRunning)
             return;
         audioThreadHandler.post(() -> {
+            System.out.println("try123 10");
+
             if (audioEncoder == null) try {
                 audioEncoder = MediaCodec.createEncoderByType("audio/mp4a-latm");
                 MediaFormat format = new MediaFormat();
@@ -279,6 +296,8 @@ class VideoFileRenderer implements VideoSink, SamplesReadyCallback {
                 audioEncoder.start();
                 audioInputBuffers = audioEncoder.getInputBuffers();
                 audioOutputBuffers = audioEncoder.getOutputBuffers();
+                System.out.println("try123 11");
+
             } catch (IOException exception) {
                 Log.wtf(TAG, exception);
             }

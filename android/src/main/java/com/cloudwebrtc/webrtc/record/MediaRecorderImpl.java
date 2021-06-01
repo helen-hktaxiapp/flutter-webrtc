@@ -57,6 +57,7 @@ public class MediaRecorderImpl {
         //noinspection ResultOfMethodCallIgnored
         file.getParentFile().mkdirs();
         if (videoTrack != null) {
+          System.out.println("try123 1");
             videoFileRenderer = new VideoFileRenderer(
                 file.getAbsolutePath(),
                 EglUtils.getRootEglBaseContext(),
