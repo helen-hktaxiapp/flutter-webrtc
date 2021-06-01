@@ -149,5 +149,6 @@ public class AudioFileRenderer implements JavaAudioDeviceModule.SamplesReadyCall
 
                 // result.success(null);
             });
+        drainAudio();
     }
 }
