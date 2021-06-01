@@ -190,7 +190,7 @@ public class MediaRecorderImpl {
         if (audioInterceptor != null){
           Log.d(TAG, "audioInterceptor detachCallback but not null");
           audioInterceptor.detachCallback(id);
-          audioFileRenderer.release(result);
+          audioFileRenderer.release();
           audioFileRenderer = null;
         }
         if (videoTrack != null && videoFileRenderer != null) {
