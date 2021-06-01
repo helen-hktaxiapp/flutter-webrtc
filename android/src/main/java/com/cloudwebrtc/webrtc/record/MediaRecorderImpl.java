@@ -41,8 +41,7 @@ public class MediaRecorderImpl {
     private static final int BUFFER_SIZE_FACTOR = 2;
     // private @Nullable AudioRecordThread audioThread = null;
     private Thread audioThread = null;
-    
-
+    private AudioFileRenderer audioFileRenderer;
 
     public MediaRecorderImpl(Integer id, @Nullable VideoTrack videoTrack, @Nullable AudioSamplesInterceptor audioInterceptor) {
         this.id = id;
@@ -72,21 +71,15 @@ public class MediaRecorderImpl {
                 //TODO(rostopira): audio only recording
                 // throw new Exception("Audio-only recording not implemented yet");
                 Log.d(TAG, "MediaRecorder123");
-                initRecording();
-                startAudioRecord(audioInterceptor);
-                // // audioInterceptor.attachCallback(id, )
-                // audioInterceptor
+                // initRecording();
+                // startAudioRecord(audioInterceptor);
+
                 Log.d(TAG, "Try to use onWebrtcSamplesReady");
-                // byteArrayToFile();
+                audioFileRenderer = new AudioFileRenderer(file);
+                audioInterceptor.attachCallback(id, audioFileRenderer);
             }
         }
     }
-
-    // private void byteArrayToFile(){
-    //   try (FileOutputStream stream = new FileOutputStream(path)) {
-    //     stream.write(bytes);
-    //   }
-    // }
     
     private void initRecording(){
         //REFERENCE TO APPRTCMOBILE GITHUB https://github.com/jianrong-rtc/AppRTCMobile.git
