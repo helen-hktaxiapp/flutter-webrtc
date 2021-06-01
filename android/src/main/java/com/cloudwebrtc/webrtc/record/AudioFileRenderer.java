@@ -131,7 +131,7 @@ public class AudioFileRenderer implements JavaAudioDeviceModule.SamplesReadyCall
     /**
      * Release all resources. All already posted frames will be rendered first.
      */
-    void release(MethodChannel.Result result) {
+    void release() { //MethodChannel.Result result
         isRunning = false;
         if (audioThreadHandler != null)
             audioThreadHandler.post(() -> {
@@ -147,7 +147,7 @@ public class AudioFileRenderer implements JavaAudioDeviceModule.SamplesReadyCall
                 }
                 audioThread.quit();
 
-                result.success(null);
+                // result.success(null);
             });
     }
 }

@@ -190,13 +190,15 @@ public class MediaRecorderImpl {
         if (audioInterceptor != null){
           Log.d(TAG, "audioInterceptor detachCallback but not null");
           audioInterceptor.detachCallback(id);
+          audioFileRenderer.release(result);
+          audioFileRenderer = null;
         }
         if (videoTrack != null && videoFileRenderer != null) {
             videoTrack.removeSink(videoFileRenderer);
             videoFileRenderer.release();
             videoFileRenderer = null;
         }
-        stopAudioRecord();
+        // stopAudioRecord();
     }
 
     private boolean stopAudioRecord() {
