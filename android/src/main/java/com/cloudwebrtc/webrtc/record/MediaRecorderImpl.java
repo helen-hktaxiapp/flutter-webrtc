@@ -153,7 +153,7 @@ public class MediaRecorderImpl {
         assertTrue(audioThread == null);
         try {
           Log.d(TAG, "audioSampleInterceptor.write()");
-          audioSampleInterceptor.write();
+        //   audioSampleInterceptor
           audioRecord.startRecording();
         } catch (IllegalStateException e) {
             Log.d(TAG,
