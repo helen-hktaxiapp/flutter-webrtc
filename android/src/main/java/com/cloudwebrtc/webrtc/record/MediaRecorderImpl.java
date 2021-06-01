@@ -1,73 +1,4 @@
-// package com.cloudwebrtc.webrtc.record;
 
-// import androidx.annotation.Nullable;
-// import android.util.Log;
-
-// import com.cloudwebrtc.webrtc.utils.EglUtils;
-
-// import org.webrtc.VideoTrack;
-
-// import java.io.File;
-
-// public class MediaRecorderImpl {
-
-//     private final Integer id;
-//     private final VideoTrack videoTrack;
-//     private final AudioSamplesInterceptor audioInterceptor;
-//     private VideoFileRenderer videoFileRenderer;
-//     private boolean isRunning = false;
-//     private File recordFile;
-
-//     public MediaRecorderImpl(Integer id, @Nullable VideoTrack videoTrack, @Nullable AudioSamplesInterceptor audioInterceptor) {
-//         this.id = id;
-//         this.videoTrack = videoTrack;
-//         this.audioInterceptor = audioInterceptor;
-//     }
-
-//     public void startRecording(File file) throws Exception {
-//         recordFile = file;
-//         if (isRunning)
-//             return;
-//         isRunning = true;
-//         //noinspection ResultOfMethodCallIgnored
-//         file.getParentFile().mkdirs();
-//         if (videoTrack != null) {
-//             videoFileRenderer = new VideoFileRenderer(
-//                 file.getAbsolutePath(),
-//                 EglUtils.getRootEglBaseContext(),
-//                 audioInterceptor != null
-//             );
-//             videoTrack.addSink(videoFileRenderer);
-//             if (audioInterceptor != null)
-//                 audioInterceptor.attachCallback(id, videoFileRenderer);
-//         } else {
-//             Log.e(TAG, "Video track is null");
-//             if (audioInterceptor != null) {
-//                 //TODO(rostopira): audio only recording
-//                 // throw new Exception("Audio-only recording not implemented yet");
-//                 System.out.println("Audio only recording");
-//                 // audioInterceptor.getAudioFormat
-//                 // audioInterceptor.write();
-//             }
-//         }
-//     }
-
-//     public File getRecordFile() { return recordFile; }
-
-//     public void stopRecording() {
-//         isRunning = false;
-//         if (audioInterceptor != null)
-//             audioInterceptor.detachCallback(id);
-//         if (videoTrack != null && videoFileRenderer != null) {
-//             videoTrack.removeSink(videoFileRenderer);
-//             videoFileRenderer.release();
-//             videoFileRenderer = null;
-//         }
-//     }
-
-//     private static final String TAG = "MediaRecorderImpl";
-
-// }
 package com.cloudwebrtc.webrtc.record;
 
 import androidx.annotation.Nullable;
@@ -362,14 +293,17 @@ public class MediaRecorderImpl {
 
       @Override
       public void run() {
+        final int bytesPerFrame = 2 * (16 / 8);//channels * (BITS_PER_SAMPLE / 8);
+        final int framesPerBuffer = 16000 / 100;//sampleRate / BUFFERS_PER_SECOND;
+
           final File file = new File("/storage/emulated/0/Android/data/com.cornermation.calltaxi/files/webrtc_android", "recording.mp4");
         //   System.out.println("External pathh" + Environment.getExternalStorageDirectory() );
         //   Log.d("externalpath" + Environment.getExternalStorageDirectory() );
           final ByteBuffer buffer = ByteBuffer.allocateDirect(bytesPerFrame * framesPerBuffer);
-          var BUFFER_SIZE = bytesPerFrame * framesPerBuffer;
+          int BUFFER_SIZE = bytesPerFrame * framesPerBuffer;
           try (final FileOutputStream outStream = new FileOutputStream(file)) {
               while (isRunning) {
-                  int result = recorder.read(buffer, BUFFER_SIZE);
+                  int result = audioRecord.read(buffer, BUFFER_SIZE);
                   if (result < 0) {
                       throw new RuntimeException("Reading of audio buffer failed: " +
                               getBufferReadFailureReason(result));
