@@ -21,16 +21,21 @@ class MediaStreamNative extends MediaStream {
 
   void setMediaTracks(List<dynamic> audioTracks, List<dynamic> videoTracks) {
     _audioTracks.clear();
-    audioTracks?.forEach((track) {
-      _audioTracks.add(MediaStreamTrackNative(
-          track['id'], track['label'], track['kind'], track['enabled']));
-    });
+
+    if (audioTracks != null) {
+      audioTracks.forEach((track) {
+        _audioTracks.add(MediaStreamTrackNative(
+            track['id'], track['label'], track['kind'], track['enabled']));
+      });
+    }
 
     _videoTracks.clear();
-    videoTracks?.forEach((track) {
-      _videoTracks.add(MediaStreamTrackNative(
-          track['id'], track['label'], track['kind'], track['enabled']));
-    });
+    if (videoTracks != null) {
+      videoTracks.forEach((track) {
+        _videoTracks.add(MediaStreamTrackNative(
+            track['id'], track['label'], track['kind'], track['enabled']));
+      });
+    }
   }
 
   @override
@@ -40,7 +45,7 @@ class MediaStreamNative extends MediaStream {
 
   @override
   Future<void> getMediaTracks() async {
-    final response = await _channel.invokeMethod<Map<dynamic, dynamic>>(
+    final response = await WebRTC.invokeMethod(
       'mediaStreamGetTracks',
       <String, dynamic>{'streamId': id},
     );

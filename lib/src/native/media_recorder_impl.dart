@@ -13,30 +13,31 @@ class MediaRecorderNative extends MediaRecorder {
 
   @override
   Future<void> start(String path,
-      {MediaStreamTrack videoTrack, RecorderAudioChannel audioChannel
+      {MediaStreamTrack? videoTrack, RecorderAudioChannel? audioChannel
       // TODO(cloudwebrtc): add codec/quality options
       }) async {
+    // ignore: unnecessary_null_comparison
     if (path == null) {
       throw ArgumentError.notNull('path');
     }
-    print("MediaRecorderNative start");
+    print('MediaRecorderNative start');
 
     if (audioChannel == null && videoTrack == null) {
-      print("No Audio Channel or video track.");
+      print('No Audio Channel or video track.');
       throw Exception('Neither audio nor video track were provided');
     }
 
     await WebRTC.methodChannel().invokeMethod('startRecordToFile', {
       'path': path,
-      'audioChannel': audioChannel?.index,
-      'videoTrackId': videoTrack?.id,
+      if (audioChannel != null) 'audioChannel': audioChannel.index,
+      if (videoTrack != null) 'videoTrackId': videoTrack.id,
       'recorderId': _recorderId
     });
   }
 
   @override
   void startWeb(MediaStream stream,
-      {Function(dynamic blob, bool isLastOne) onDataChunk, String mimeType}) {
+      {Function(dynamic blob, bool isLastOne)? onDataChunk, String? mimeType}) {
     throw 'It\'s for Flutter Web only';
   }
 
