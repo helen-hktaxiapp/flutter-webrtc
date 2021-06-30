@@ -109,9 +109,10 @@ abstract class MediaStreamTrack {
     throw UnimplementedError();
   }
 
-  Future<List<String>> getAudioDevices() async{
-    List arr = [];
-    return arr;
+  Future<List<String>?> getAudioDevices() async{
+    // List arr = [];
+    // return arr;
+    throw UnimplementedError();
   }
 
   void enableSpeakerphone(bool enable) async {
