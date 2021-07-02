@@ -37,7 +37,7 @@ public class FlutterWebRTCPlugin implements FlutterPlugin, ActivityAware {
   private static Application application;
 
   private RTCAudioManager rtcAudioManager;
-  private MethodChannel channel;
+  private static MethodChannel channel;
   private MethodCallHandlerImpl methodCallHandler;
   private LifeCycleObserver observer;
   private Lifecycle lifecycle;
@@ -133,9 +133,78 @@ public class FlutterWebRTCPlugin implements FlutterPlugin, ActivityAware {
       public void setSpeakerphoneOn(boolean on) {
         if (rtcAudioManager != null) {
           rtcAudioManager.setSpeakerphoneOn(on);
+          rtcAudioManager.setBluetoothScoOn(!on);
+          // listener.onChanged();
+          Log.d(TAG, "listener called from setspeakeron");
+  
         }
       }
+  
+      @Override
+      public void setBluetoothScoOn(boolean on) {
+        if (rtcAudioManager != null) {
+          rtcAudioManager.setBluetoothScoOn(true);
+          rtcAudioManager.setSpeakerphoneOn(false);
+          // listener.onChanged();
+          Log.d(TAG, "listener called from setbluetoothon");
+        }
+      }
+  
+      public void setReceiverOn(boolean on) {
+        if (rtcAudioManager != null) {
+          rtcAudioManager.setMicrophoneMute(false);
+          rtcAudioManager.setReceiverOn(true);
+          // listener.onChanged();
+          Log.d(TAG, "listener called from setreceiveron");
+        }
+      }
+  
+      public List getAudioDevices() {
+        Log.d(TAG, "Getting audio devices...");
+        List<String> audioDeviceList = new ArrayList<String>();
+        Set audioDeviceSet = new HashSet();
+        if (rtcAudioManager != null) {
+          // rtcAudioManager.updateAudioDeviceState();
+          audioDeviceSet = rtcAudioManager.getAudioNames();
+          System.out.println("FlutterWebRTCPlugin getAudioDevices" + audioDeviceSet);
+          for (Object object : audioDeviceSet) {
+            audioDeviceList.add(String.valueOf(object));
+          }
+        }
+        System.out.println("FlutterWebRTCPlugin getAudioDevicesList" + audioDeviceList);
+  
+        return audioDeviceList;
+      }
+  
+      public void setSpeakerOnFromBluetooth() {
+        Log.d(TAG, "setspeakeronfrombluetooth1");
+  
+        if (rtcAudioManager != null) {
+          rtcAudioManager.setSpeakerOnFromBluetooth();
+          // rtcAudioManager.setSpeakerphoneOn(true);
+          // rtcAudioManager.setBluetoothScoOn(false);
+          // listener.onChanged();
+          Log.d(TAG, "setspeakeronfrombluetooth2");
+  
+        }
+      }
+  
+      public String getCurrentOutput() {
+        Log.d(TAG, "Getting current output...");
+        String currentOutput = "";
+        if (rtcAudioManager != null) {
+          currentOutput = rtcAudioManager.getCurrentOutput();
+        }
+        Log.d(TAG, "Current output = " + currentOutput);
+        return currentOutput;
+      }
+  
+      public void setListener() {
+        Log.d(TAG, "setlistener called from flutterwebrtcplugin java");
+        rtcAudioManager.updateAudioDeviceState();
+      }
     });
+
 
     channel = new MethodChannel(messenger, "FlutterWebRTC.Method");
     channel.setMethodCallHandler(methodCallHandler);
@@ -161,6 +230,14 @@ public class FlutterWebRTCPlugin implements FlutterPlugin, ActivityAware {
     // TODO(henrika): add callback handler.
   }
 
+  public static AudioEventListener listener = new AudioEventListener() {
+    @Override
+    public void onChanged() {
+      Log.d(TAG, "Listener on changed invoke output changed method...");
+      channel.invokeMethod("setListener", 1);
+    }
+  };
+
   private class LifeCycleObserver implements Application.ActivityLifecycleCallbacks, DefaultLifecycleObserver {
 
     @Override
@@ -181,122 +258,32 @@ public class FlutterWebRTCPlugin implements FlutterPlugin, ActivityAware {
     }
 
     @Override
-    public void setSpeakerphoneOn(boolean on) {
-      if (rtcAudioManager != null) {
-        rtcAudioManager.setSpeakerphoneOn(on);
-        rtcAudioManager.setBluetoothScoOn(!on);
-        // listener.onChanged();
-        Log.d(TAG, "listener called from setspeakeron");
-
+    public void onResume(LifecycleOwner owner) {
+      if (null != methodCallHandler) {
+        methodCallHandler.reStartCamera();
       }
     }
 
     @Override
-    public void setBluetoothScoOn(boolean on) {
-      if (rtcAudioManager != null) {
-        rtcAudioManager.setBluetoothScoOn(true);
-        rtcAudioManager.setSpeakerphoneOn(false);
-        // listener.onChanged();
-        Log.d(TAG, "listener called from setbluetoothon");
-      }
+    public void onActivityPaused(Activity activity) {
+
     }
 
-    public void setReceiverOn(boolean on) {
-      if (rtcAudioManager != null) {
-        rtcAudioManager.setMicrophoneMute(false);
-        rtcAudioManager.setReceiverOn(true);
-        // listener.onChanged();
-        Log.d(TAG, "listener called from setreceiveron");
-      }
-    }
-
-    public List getAudioDevices() {
-      Log.d(TAG, "Getting audio devices...");
-      List<String> audioDeviceList = new ArrayList<String>();
-      Set audioDeviceSet = new HashSet();
-      if (rtcAudioManager != null) {
-        // rtcAudioManager.updateAudioDeviceState();
-        audioDeviceSet = rtcAudioManager.getAudioNames();
-        System.out.println("FlutterWebRTCPlugin getAudioDevices" + audioDeviceSet);
-        for (Object object : audioDeviceSet) {
-          audioDeviceList.add(String.valueOf(object));
-        }
-      }
-      System.out.println("FlutterWebRTCPlugin getAudioDevicesList" + audioDeviceList);
-
-      return audioDeviceList;
-    }
-
-    public void setSpeakerOnFromBluetooth() {
-      Log.d(TAG, "setspeakeronfrombluetooth1");
-
-      if (rtcAudioManager != null) {
-        rtcAudioManager.setSpeakerOnFromBluetooth();
-        // rtcAudioManager.setSpeakerphoneOn(true);
-        // rtcAudioManager.setBluetoothScoOn(false);
-        // listener.onChanged();
-        Log.d(TAG, "setspeakeronfrombluetooth2");
-
-      }
-    }
-
-    public String getCurrentOutput() {
-      Log.d(TAG, "Getting current output...");
-      String currentOutput = "";
-      if (rtcAudioManager != null) {
-        currentOutput = rtcAudioManager.getCurrentOutput();
-      }
-      Log.d(TAG, "Current output = " + currentOutput);
-      return currentOutput;
-    }
-
-    public void setListener() {
-      Log.d(TAG, "setlistener called from flutterwebrtcplugin java");
-      rtcAudioManager.updateAudioDeviceState();
-    }
-  };
-
-  @Override
-  public void onResume(LifecycleOwner owner) {
-    if (null != methodCallHandler) {
-      methodCallHandler.reStartCamera();
-    }
-  }
-
-  @Override
-  public void onActivityPaused(Activity activity) {
-
-  }
-
-  @Override
-  public void onActivityStopped(Activity activity) {
-
-  }
-
-  public static AudioEventListener listener = new AudioEventListener() {
     @Override
-    public void onChanged() {
-      Log.d(TAG, "Listener on changed invoke output changed method...");
-      channel.invokeMethod("setListener", 1);
+    public void onActivityStopped(Activity activity) {
+
+    }
+
+    @Override
+    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+    }
+
+    @Override
+    public void onActivityDestroyed(Activity activity) {
+
     }
   };
 
-  // This method is called when the audio manager reports audio device change,
-  // e.g. from wired headset to speakerphone.
-  private void onAudioManagerDevicesChanged(final RTCAudioManager.AudioDevice device,
-      final Set<RTCAudioManager.AudioDevice> availableDevices) {
-    // listener.onChanged();
-    Log.d(TAG, "onAudioManagerDevicesChanged: " + availableDevices + ", " + "selected: " + device);
-    // TODO(henrika): add callback handler.
-  }
-
-  @Override
-  public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-
-  }
-
-  @Override
-  public void onActivityDestroyed(Activity activity) {
-
-  }
 }
+
