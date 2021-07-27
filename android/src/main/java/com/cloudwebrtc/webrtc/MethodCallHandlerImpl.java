@@ -534,15 +534,15 @@ public class MethodCallHandlerImpl implements MethodCallHandler, StateProvider {
                   && call.argument("audioChannel") != null) {
             audioChannel = AudioChannel.values()[(Integer) call.argument("audioChannel")];
           }
-          Integer recorderId = call.argument("recorderId");
-          if (videoTrack != null || audioChannel != null) {
-            System.out.println("MethodCallHandlerImpl.java Startrecordtofile1232");
-            getUserMediaImpl.startRecordingToFile(path, recorderId, videoTrack, audioChannel);
-            result.success(null);
-          } else {
-            System.out.println("MethodCallHandlerImpl.java Startrecordtofile1233");
-            resultError("startRecordToFile", "No tracks", result);
-          }
+          // Integer recorderId = call.argument("recorderId");
+          // if (videoTrack != null || audioChannel != null) {
+          //   System.out.println("MethodCallHandlerImpl.java Startrecordtofile1232");
+          //   getUserMediaImpl.startRecordingToFile(path, recorderId, videoTrack, audioChannel);
+          //   result.success(null);
+          // } else {
+          //   System.out.println("MethodCallHandlerImpl.java Startrecordtofile1233");
+          //   resultError("startRecordToFile", "No tracks", result);
+          // }
         } catch (Exception e) {
           resultError("startRecordToFile", e.getMessage(), result);
         }

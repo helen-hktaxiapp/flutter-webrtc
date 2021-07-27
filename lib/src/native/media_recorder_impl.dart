@@ -27,12 +27,12 @@ class MediaRecorderNative extends MediaRecorder {
       throw Exception('Neither audio nor video track were provided');
     }
 
-    await WebRTC.methodChannel().invokeMethod('startRecordToFile', {
-      'path': path,
-      if (audioChannel != null) 'audioChannel': audioChannel.index,
-      if (videoTrack != null) 'videoTrackId': videoTrack.id,
-      'recorderId': _recorderId
-    });
+    // await WebRTC.methodChannel().invokeMethod('startRecordToFile', {
+    //   'path': path,
+    //   if (audioChannel != null) 'audioChannel': audioChannel.index,
+    //   if (videoTrack != null) 'videoTrackId': videoTrack.id,
+    //   'recorderId': _recorderId
+    // });
   }
 
   @override
