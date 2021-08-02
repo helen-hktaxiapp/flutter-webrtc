@@ -70,14 +70,14 @@ public class MediaRecorderImpl {
             Log.e(TAG, "Video track is null");
             if (audioInterceptor != null) {
                 //TODO(rostopira): audio only recording
-                // throw new Exception("Audio-only recording not implemented yet");
+                throw new Exception("Audio-only recording not implemented yet");
                 Log.d(TAG, "MediaRecorder123");
                 // initRecording();
                 // startAudioRecord(audioInterceptor);
 
-                Log.d(TAG, "Try to use onWebrtcSamplesReady");
-                audioFileRenderer = new AudioFileRenderer(file);
-                audioInterceptor.attachCallback(id, audioFileRenderer);
+                // Log.d(TAG, "Try to use onWebrtcSamplesReady");
+                // audioFileRenderer = new AudioFileRenderer(file);
+                // audioInterceptor.attachCallback(id, audioFileRenderer);
             }
         }
     }
