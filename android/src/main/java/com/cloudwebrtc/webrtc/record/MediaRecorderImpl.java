@@ -71,7 +71,7 @@ public class MediaRecorderImpl {
             if (audioInterceptor != null) {
                 //TODO(rostopira): audio only recording
                 throw new Exception("Audio-only recording not implemented yet");
-                Log.d(TAG, "MediaRecorder123");
+                // Log.d(TAG, "MediaRecorder123");
                 // initRecording();
                 // startAudioRecord(audioInterceptor);
 
