@@ -304,6 +304,9 @@ public class RTCAudioManager {
     audioNameSet.clear();
     audioNameSet.add("microphone");
     audioNameSet.add("speaker");
+    if (audioManager.isBluetoothScoOn()){
+      audioNameSet.add("bluetooth");
+    }
   }
 
   @SuppressWarnings("deprecation") // TODO(henrika): audioManager.abandonAudioFocus() is deprecated.
